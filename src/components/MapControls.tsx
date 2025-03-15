@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { PosterSize, TextOverlay, TextStyle } from './types';
+import type { PosterSize, TextOverlay, TextStyle, MapStyle } from '../types';
 import './MapControls.css';
 
 interface MapControlsProps {
@@ -10,6 +10,9 @@ interface MapControlsProps {
   selectedPosterSize: PosterSize;
   onPosterSizeChange: (size: PosterSize) => void;
   onCapture: () => void;
+  mapStyles: MapStyle[];
+  selectedMapStyle: MapStyle;
+  onMapStyleChange: (style: MapStyle) => void;
 }
 
 const POSTER_SIZES: PosterSize[] = [
@@ -27,7 +30,10 @@ const MapControls: React.FC<MapControlsProps> = ({
   textOverlays,
   selectedPosterSize,
   onPosterSizeChange,
-  onCapture
+  onCapture,
+  mapStyles,
+  selectedMapStyle,
+  onMapStyleChange
 }) => {
   const [newText, setNewText] = useState('');
   const [fontSize, setFontSize] = useState(24);
@@ -48,6 +54,25 @@ const MapControls: React.FC<MapControlsProps> = ({
 
   return (
     <div className="map-controls">
+      <div className="control-section">
+        <h3>Map Style</h3>
+        <div className="style-selector">
+          <select
+            value={selectedMapStyle.name}
+            onChange={(e) => {
+              const style = mapStyles.find(s => s.name === e.target.value);
+              if (style) onMapStyleChange(style);
+            }}
+          >
+            {mapStyles.map(style => (
+              <option key={style.name} value={style.name}>
+                {style.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       <div className="control-section">
         <h3>Text Controls</h3>
         <div className="text-input-group">

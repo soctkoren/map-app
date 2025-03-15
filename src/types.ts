@@ -20,4 +20,10 @@ export interface TextOverlay {
   fontSize: number;
   color: string;
   rotation: number;
+}
+
+export interface MapStyle {
+  name: string;
+  url: string;
+  attribution: string;
 } 

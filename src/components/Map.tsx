@@ -2,13 +2,38 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import type { LatLngTuple } from 'leaflet';
 import html2canvas from 'html2canvas';
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Map.css';
 import MapControls from './MapControls';
-import type { PosterSize, TextOverlay, TextStyle } from './types';
+import type { PosterSize, TextOverlay, TextStyle, MapStyle } from './types';
 
 const DEFAULT_CENTER: LatLngTuple = [51.505, -0.09];
 const DEFAULT_ZOOM = 13;
+
+// Available map styles from OpenMapTiles
+export const MAP_STYLES: MapStyle[] = [
+  {
+    name: 'OSM Default',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  },
+  {
+    name: 'OSM Bright',
+    url: 'https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+  },
+  {
+    name: 'Dark Matter',
+    url: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+  },
+  {
+    name: 'Positron',
+    url: 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+  }
+];
 
 // Component to handle map instance operations
 const MapOperations: React.FC<{ onMapReady: (map: L.Map) => void }> = ({ onMapReady }) => {
@@ -36,6 +61,9 @@ interface MapControlsProps {
   selectedPosterSize: PosterSize;
   onPosterSizeChange: (size: PosterSize) => void;
   onCapture: () => Promise<void>;
+  mapStyles: MapStyle[];
+  selectedMapStyle: MapStyle;
+  onMapStyleChange: (style: MapStyle) => void;
 }
 
 const Map: React.FC = () => {
@@ -47,6 +75,7 @@ const Map: React.FC = () => {
     pixelWidth: 5400,
     pixelHeight: 7200
   });
+  const [selectedMapStyle, setSelectedMapStyle] = useState<MapStyle>(MAP_STYLES[0]);
   const [viewportStyle, setViewportStyle] = useState({
     width: '100%',
     height: '100%',
@@ -141,6 +170,10 @@ const Map: React.FC = () => {
 
   const handlePosterSizeChange = (size: PosterSize) => {
     setSelectedPosterSize(size);
+  };
+
+  const handleMapStyleChange = (style: MapStyle) => {
+    setSelectedMapStyle(style);
   };
 
   const handleMouseDown = (e: React.MouseEvent, overlay: TextOverlay) => {
@@ -269,8 +302,8 @@ const Map: React.FC = () => {
           >
             <MapOperations onMapReady={handleMapReady} />
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution={selectedMapStyle.attribution}
+              url={selectedMapStyle.url}
             />
             <svg className="text-overlay-container">
               {textOverlays.map((overlay) => (
@@ -307,6 +340,9 @@ const Map: React.FC = () => {
         selectedPosterSize={selectedPosterSize}
         onPosterSizeChange={handlePosterSizeChange}
         onCapture={handleCapture}
+        mapStyles={MAP_STYLES}
+        selectedMapStyle={selectedMapStyle}
+        onMapStyleChange={handleMapStyleChange}
       />
     </div>
   );

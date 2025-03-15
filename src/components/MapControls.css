@@ -242,4 +242,29 @@
 
 .capture-btn:hover {
   background: #218838;
+}
+
+.style-selector {
+  margin-bottom: 16px;
+}
+
+.style-selector select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+}
+
+.style-selector select:hover {
+  border-color: #999;
+}
+
+.style-selector select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 } 
