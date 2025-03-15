@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
-import type { LatLngTuple } from 'leaflet';
+import * as L from 'leaflet';
+import type { PosterSize, TextOverlay, TextStyle, MapStyle } from '../types';
 import html2canvas from 'html2canvas';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Map.css';
 import MapControls from './MapControls';
-import type { PosterSize, TextOverlay, TextStyle, MapStyle } from './types';
 
-const DEFAULT_CENTER: LatLngTuple = [51.505, -0.09];
+const DEFAULT_CENTER: L.LatLngTuple = [51.505, -0.09];
 const DEFAULT_ZOOM = 13;
 
 // Available map styles from OpenMapTiles
@@ -128,6 +127,15 @@ const Map: React.FC = () => {
 
   const handleMapReady = (map: L.Map) => {
     mapInstanceRef.current = map;
+  };
+
+  const calculateScaledFontSize = (fontSize: number): number => {
+    if (!printViewportRef.current) return fontSize;
+    
+    const viewportWidth = printViewportRef.current.clientWidth;
+    // Base the scaling on a reference width of 1000px
+    const scaleFactor = viewportWidth / 1000;
+    return fontSize * scaleFactor;
   };
 
   const handleAddText = (text: string, style: TextStyle) => {
@@ -311,7 +319,7 @@ const Map: React.FC = () => {
                   key={overlay.id}
                   x={overlay.x}
                   y={overlay.y}
-                  fontSize={overlay.fontSize}
+                  fontSize={calculateScaledFontSize(overlay.fontSize)}
                   fill={overlay.color}
                   className={draggingId === overlay.id ? 'dragging' : ''}
                   style={{

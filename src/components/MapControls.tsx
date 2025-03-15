@@ -23,6 +23,103 @@ const POSTER_SIZES: PosterSize[] = [
   { name: '24x36"', width: 24, height: 36, pixelWidth: 7200, pixelHeight: 10800 }
 ];
 
+interface LayerEditorProps {
+  overlay: TextOverlay;
+  onUpdate: (id: string, text: string, style: TextStyle) => void;
+  onClose: () => void;
+}
+
+const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose }) => {
+  const [fontSize, setFontSize] = useState(overlay.fontSize);
+  const [textColor, setTextColor] = useState(overlay.color);
+  const [rotation, setRotation] = useState(overlay.rotation);
+  const [text, setText] = useState(overlay.text);
+
+  const handleUpdate = () => {
+    onUpdate(overlay.id, text, {
+      fontSize,
+      color: textColor,
+      rotation
+    });
+  };
+
+  return (
+    <div className="layer-editor-popup">
+      <div className="layer-editor-content">
+        <h4>Edit Layer</h4>
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            onUpdate(overlay.id, e.target.value, {
+              fontSize,
+              color: textColor,
+              rotation
+            });
+          }}
+          placeholder="Enter text..."
+        />
+        <div className="style-controls">
+          <input
+            type="number"
+            value={fontSize}
+            onChange={(e) => {
+              const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
+              if (!isNaN(newSize)) {
+                setFontSize(newSize);
+                onUpdate(overlay.id, text, {
+                  fontSize: newSize,
+                  color: textColor,
+                  rotation
+                });
+              }
+            }}
+            onBlur={(e) => {
+              const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
+              if (!isNaN(newSize)) {
+                setFontSize(newSize);
+                onUpdate(overlay.id, text, {
+                  fontSize: newSize,
+                  color: textColor,
+                  rotation
+                });
+              }
+            }}
+            min="0"
+            max="200"
+            step="1"
+            placeholder="Font size"
+          />
+          <input
+            type="color"
+            value={textColor}
+            onChange={(e) => {
+              setTextColor(e.target.value);
+              handleUpdate();
+            }}
+            title="Text color"
+          />
+          <input
+            type="range"
+            value={rotation}
+            onChange={(e) => {
+              setRotation(Number(e.target.value));
+              handleUpdate();
+            }}
+            min="-180"
+            max="180"
+            title="Rotation"
+          />
+        </div>
+        <button className="close-editor-btn" onClick={onClose}>
+          Done
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const MapControls: React.FC<MapControlsProps> = ({
   onAddText,
   onUpdateText,
@@ -40,6 +137,7 @@ const MapControls: React.FC<MapControlsProps> = ({
   const [textColor, setTextColor] = useState('#000000');
   const [rotation, setRotation] = useState(0);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
 
   const handleAddText = () => {
     if (newText.trim()) {
@@ -110,15 +208,32 @@ const MapControls: React.FC<MapControlsProps> = ({
             <button className="add-text-btn" onClick={handleAddText}>
               Add Text
             </button>
-            {textOverlays.length > 0 && (
-              <button
-                className="delete-text-btn"
-                onClick={() => onDeleteText(textOverlays[textOverlays.length - 1].id)}
-              >
-                Delete Last
-              </button>
-            )}
           </div>
+        </div>
+
+        <div className="text-layers">
+          <h4>Text Layers</h4>
+          {textOverlays.map((overlay) => (
+            <div
+              key={overlay.id}
+              className={`text-layer ${selectedLayerId === overlay.id ? 'selected' : ''}`}
+              onClick={() => setSelectedLayerId(overlay.id)}
+            >
+              <span className="layer-text">{overlay.text}</span>
+              <button
+                className="delete-layer-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteText(overlay.id);
+                  if (selectedLayerId === overlay.id) {
+                    setSelectedLayerId(null);
+                  }
+                }}
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -160,6 +275,14 @@ const MapControls: React.FC<MapControlsProps> = ({
           Capture Map
         </button>
       </div>
+
+      {selectedLayerId && (
+        <LayerEditor
+          overlay={textOverlays.find(o => o.id === selectedLayerId)!}
+          onUpdate={onUpdateText}
+          onClose={() => setSelectedLayerId(null)}
+        />
+      )}
     </div>
   );
 };
