@@ -63,16 +63,16 @@ const ScreenshotControl = () => {
   const takeScreenshot = async () => {
     try {
       setIsCapturing(true);
+      setShowSizeSelector(false);
       
       // Calculate pixel dimensions
       const pixelWidth = selectedSize.width * DPI;
       const pixelHeight = selectedSize.height * DPI;
 
       // Get the current map state
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-      const bounds = map.getBounds();
-
+      const currentBounds = map.getBounds();
+      const currentZoom = map.getZoom();
+      
       // Create a temporary map container
       const container = document.createElement('div');
       container.style.width = `${pixelWidth}px`;
@@ -82,10 +82,8 @@ const ScreenshotControl = () => {
       container.style.top = '-9999px';
       document.body.appendChild(container);
 
-      // Create a clean map instance
+      // Create a temporary map with the same dimensions and zoom as the visible map
       const tempMap = L.map(container, {
-        center: center,
-        zoom: zoom,
         zoomControl: false,
         attributionControl: false,
         dragging: false,
@@ -94,6 +92,10 @@ const ScreenshotControl = () => {
         doubleClickZoom: false,
         boxZoom: false,
         keyboard: false,
+        zoomSnap: 0,  // Allow fractional zoom levels
+        zoomAnimation: false,
+        fadeAnimation: false,
+        markerZoomAnimation: false
       });
 
       // Add a clean tile layer
@@ -101,6 +103,13 @@ const ScreenshotControl = () => {
         maxZoom: 19,
         attribution: ''
       }).addTo(tempMap);
+
+      // Set exact bounds and zoom
+      tempMap.setView(currentBounds.getCenter(), currentZoom);
+      tempMap.fitBounds(currentBounds, {
+        animate: false,
+        duration: 0
+      });
 
       // Wait for all tiles to load
       await new Promise<void>((resolve) => {
@@ -122,7 +131,8 @@ const ScreenshotControl = () => {
           checkAllLoaded();
         });
 
-        tempMap.fitBounds(bounds);
+        // Start loading tiles
+        tempMap.invalidateSize({ animate: false });
         
         // Fallback resolution in case no tiles need loading
         setTimeout(() => {
@@ -144,7 +154,16 @@ const ScreenshotControl = () => {
         height: pixelHeight,
         scale: 1,
         backgroundColor: null,
-        logging: false
+        logging: false,
+        imageTimeout: 0,  // Prevent timeout for large maps
+        onclone: (clonedDoc) => {
+          // Ensure the cloned map container has the correct size
+          const clonedContainer = clonedDoc.querySelector('div') as HTMLElement;
+          if (clonedContainer) {
+            clonedContainer.style.width = `${pixelWidth}px`;
+            clonedContainer.style.height = `${pixelHeight}px`;
+          }
+        }
       });
 
       // Create download link
@@ -164,6 +183,11 @@ const ScreenshotControl = () => {
     }
   };
 
+  const handleSizeSelect = (size: PosterSize) => {
+    setSelectedSize(size);
+    setShowSizeSelector(false);  // Close the dropdown after selection
+  };
+
   return (
     <div className="screenshot-controls">
       <button 
@@ -180,7 +204,7 @@ const ScreenshotControl = () => {
               <button
                 key={size.name}
                 className={`size-option ${selectedSize === size ? 'selected' : ''}`}
-                onClick={() => setSelectedSize(size)}
+                onClick={() => handleSizeSelect(size)}
               >
                 {size.name}
               </button>
