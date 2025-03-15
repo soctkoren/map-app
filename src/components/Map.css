@@ -6,13 +6,23 @@
 }
 
 .map-container {
-  flex: 1;
+  width: calc(100vw - 300px);
+  height: 100vh;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f0f0f0;
   overflow: hidden;
+}
+
+.map-controls {
+  width: 300px;
+  height: 100vh;
+  background: white;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .print-viewport {

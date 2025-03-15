@@ -337,9 +337,6 @@ const Map: React.FC = () => {
               ))}
             </svg>
           </MapContainer>
-          <div className="print-size-indicator">
-            {selectedPosterSize.name} ({selectedPosterSize.width}" × {selectedPosterSize.height}")
-          </div>
         </div>
       </div>
       <MapControls

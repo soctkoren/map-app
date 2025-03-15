@@ -1,25 +1,19 @@
 .map-controls {
-  position: fixed;
-  right: 0;
-  top: 0;
-  bottom: 0;
   width: 300px;
-  background: #ffffff;
-  color: #333333;
+  height: 100vh;
+  background: white;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  box-sizing: border-box;
   overflow-y: auto;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  border-left: 1px solid #dee2e6;
 }
 
 .control-section {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 15px;
-  border: 1px solid #dee2e6;
+  margin-bottom: 30px;
+}
+
+.control-section:last-child {
+  margin-bottom: 0;
 }
 
 .control-section h3 {
@@ -395,4 +389,35 @@
 
 .text-controls-header h3 {
   margin: 0;
+}
+
+.current-size-info {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.current-size-info .size-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.current-size-info .size-dimensions {
+  font-size: 14px;
+  color: #666;
+}
+
+.current-size-info .size-pixels {
+  font-size: 12px;
+  color: #888;
+}
+
+.print-size-indicator {
+  display: none;
 } 

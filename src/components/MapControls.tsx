@@ -228,6 +228,11 @@ const MapControls: React.FC<MapControlsProps> = ({
             {showSizeSelector ? 'Hide Sizes' : 'Show Sizes'}
           </button>
         </div>
+        <div className="current-size-info">
+          <span className="size-name">{selectedPosterSize.name}</span>
+          <span className="size-dimensions">({selectedPosterSize.width}" × {selectedPosterSize.height}")</span>
+          <span className="size-pixels">{selectedPosterSize.pixelWidth} × {selectedPosterSize.pixelHeight}px</span>
+        </div>
         {showSizeSelector && (
           <div className="print-settings">
             <div className="size-info">
