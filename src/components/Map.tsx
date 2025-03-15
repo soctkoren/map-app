@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import SearchBar from './SearchBar';
-import MapControls from './MapControls';
-import RoutePlanner from './RoutePlanner';
+import ScreenshotControl from './ScreenshotControl';
 
 interface Route {
   start: [number, number];
@@ -11,52 +10,32 @@ interface Route {
 
 const Map = () => {
   const [isMounted, setIsMounted] = useState(false);
-  const [currentRoute, setCurrentRoute] = useState<Route | null>(null);
   const [MapComponent, setMapComponent] = useState<any>(null);
+  const mapRef = useRef<any>(null);
 
   useEffect(() => {
     const loadMap = async () => {
       const L = await import('leaflet');
-      const { MapContainer, TileLayer, ZoomControl, Polyline } = await import('react-leaflet');
+      const { MapContainer, TileLayer, ZoomControl } = await import('react-leaflet');
       await import('leaflet/dist/leaflet.css');
       
-      setMapComponent({ MapContainer, TileLayer, ZoomControl, Polyline });
+      // Fix Leaflet default icon issue
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      });
+      
+      setMapComponent({ MapContainer, TileLayer, ZoomControl });
       setIsMounted(true);
     };
 
     loadMap();
   }, []);
 
-  const handleSearch = (query: string) => {
-    // TODO: Implement geocoding
-    console.log('Searching for:', query);
-  };
-
-  const handleRouteCreate = async (start: [number, number], end: [number, number]) => {
-    try {
-      // Using OSRM for routing (OpenStreetMap Routing Machine)
-      const response = await fetch(
-        `http://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`
-      );
-      const data = await response.json();
-
-      if (data.code === 'Ok') {
-        const coordinates = data.routes[0].geometry.coordinates.map((coord: number[]) => [
-          coord[1],
-          coord[0]
-        ]);
-        
-        setCurrentRoute({
-          start,
-          end,
-          coordinates
-        });
-      } else {
-        alert('Could not find a route between these points');
-      }
-    } catch (error) {
-      console.error('Error creating route:', error);
-      alert('Error creating route');
+  const handleSearch = (location: { lat: number; lng: number; display_name: string }) => {
+    if (mapRef.current) {
+      mapRef.current.setView([location.lat, location.lng], 13);
     }
   };
 
@@ -64,7 +43,7 @@ const Map = () => {
     return <div>Loading map...</div>;
   }
 
-  const { MapContainer, TileLayer, ZoomControl, Polyline } = MapComponent;
+  const { MapContainer, TileLayer, ZoomControl } = MapComponent;
 
   return (
     <div style={{ height: '100vh', width: '100%' }}>
@@ -74,22 +53,14 @@ const Map = () => {
         zoom={13}
         style={{ height: '100%', width: '100%' }}
         zoomControl={false}
+        ref={mapRef}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <ZoomControl position="bottomright" />
-        <MapControls />
-        <RoutePlanner onRouteCreate={handleRouteCreate} />
-        {currentRoute && (
-          <Polyline
-            positions={currentRoute.coordinates}
-            color="#007bff"
-            weight={3}
-            opacity={0.8}
-          />
-        )}
+        <ScreenshotControl />
       </MapContainer>
     </div>
   );
