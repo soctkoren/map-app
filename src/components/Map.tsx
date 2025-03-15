@@ -74,7 +74,9 @@ const Map: React.FC = () => {
     pixelWidth: 5400,
     pixelHeight: 7200
   });
-  const [selectedMapStyle, setSelectedMapStyle] = useState<MapStyle>(MAP_STYLES[0]);
+  const [selectedMapStyle, setSelectedMapStyle] = useState<MapStyle>(
+    MAP_STYLES.find(style => style.name === 'Positron') || MAP_STYLES[0]
+  );
   const [viewportStyle, setViewportStyle] = useState({
     width: '100%',
     height: '100%',
