@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import React, { useState, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import type { LatLngTuple } from 'leaflet';
+import html2canvas from 'html2canvas';
 import 'leaflet/dist/leaflet.css';
 import './Map.css';
 import MapControls from './MapControls';
@@ -9,6 +10,15 @@ import type { PosterSize, TextOverlay, TextStyle } from './types';
 const DEFAULT_CENTER: LatLngTuple = [51.505, -0.09];
 const DEFAULT_ZOOM = 13;
 
+// Component to handle map instance operations
+const MapOperations: React.FC<{ onMapReady: (map: L.Map) => void }> = ({ onMapReady }) => {
+  const map = useMap();
+  useEffect(() => {
+    onMapReady(map);
+  }, [map, onMapReady]);
+  return null;
+};
+
 interface MapControlsProps {
   onAddText: (text: string, style: TextStyle) => void;
   onUpdateText: (id: string, text: string, style: TextStyle) => void;
@@ -16,6 +26,7 @@ interface MapControlsProps {
   textOverlays: TextOverlay[];
   selectedPosterSize: PosterSize;
   onPosterSizeChange: (size: PosterSize) => void;
+  onCapture: () => Promise<void>;
 }
 
 const Map: React.FC = () => {
@@ -33,6 +44,9 @@ const Map: React.FC = () => {
     maxWidth: '100%',
     maxHeight: '100%'
   });
+  const [isCapturing, setIsCapturing] = useState(false);
+  const printViewportRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
     const updateViewportSize = () => {
@@ -45,12 +59,10 @@ const Map: React.FC = () => {
 
       let width, height;
       if (containerWidth / containerHeight > aspectRatio) {
-        // Container is wider than needed
-        height = containerHeight * 0.9; // 90% of container height
+        height = containerHeight * 0.9;
         width = height * aspectRatio;
       } else {
-        // Container is taller than needed
-        width = containerWidth * 0.9; // 90% of container width
+        width = containerWidth * 0.9;
         height = width / aspectRatio;
       }
 
@@ -66,6 +78,10 @@ const Map: React.FC = () => {
     window.addEventListener('resize', updateViewportSize);
     return () => window.removeEventListener('resize', updateViewportSize);
   }, [selectedPosterSize]);
+
+  const handleMapReady = (map: L.Map) => {
+    mapInstanceRef.current = map;
+  };
 
   const handleAddText = (text: string, style: TextStyle) => {
     const map = document.querySelector('.leaflet-container');
@@ -109,15 +125,81 @@ const Map: React.FC = () => {
     setSelectedPosterSize(size);
   };
 
+  const handleCapture = async () => {
+    if (!printViewportRef.current || !mapInstanceRef.current) return;
+    setIsCapturing(true);
+
+    try {
+      // Wait for capturing class transition
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      const viewport = printViewportRef.current;
+      const map = mapInstanceRef.current;
+      const { pixelWidth, pixelHeight } = selectedPosterSize;
+
+      // Get the current map state
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      const bounds = map.getBounds();
+
+      // Calculate the scale factor
+      const viewportRect = viewport.getBoundingClientRect();
+      const scale = pixelWidth / viewportRect.width;
+
+      // Configure html2canvas options for high DPI
+      const canvas = await html2canvas(viewport, {
+        scale,
+        width: viewportRect.width,
+        height: viewportRect.height,
+        backgroundColor: null,
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+        onclone: (clonedDoc) => {
+          // Hide UI elements in the cloned document
+          const clonedViewport = clonedDoc.querySelector('.print-viewport') as HTMLElement;
+          if (clonedViewport) {
+            const controls = clonedViewport.querySelectorAll('.leaflet-control, .print-size-indicator');
+            controls.forEach((control) => {
+              (control as HTMLElement).style.display = 'none';
+            });
+
+            // Scale text overlays
+            const texts = clonedViewport.querySelectorAll('text');
+            texts.forEach((text) => {
+              const fontSize = parseFloat(text.getAttribute('font-size') || '24');
+              text.setAttribute('font-size', `${fontSize * scale}px`);
+            });
+          }
+        }
+      });
+
+      // Create a download link
+      const link = document.createElement('a');
+      link.download = `map_${selectedPosterSize.name.replace(/['"]/g, '')}_${pixelWidth}x${pixelHeight}_300dpi.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error('Error capturing map:', error);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
   return (
     <div className="map-page">
       <div className="map-container">
-        <div className="print-viewport" style={viewportStyle}>
+        <div
+          className={`print-viewport ${isCapturing ? 'capturing' : ''}`}
+          ref={printViewportRef}
+          style={viewportStyle}
+        >
           <MapContainer
             center={DEFAULT_CENTER}
             zoom={DEFAULT_ZOOM}
             style={{ width: '100%', height: '100%' }}
           >
+            <MapOperations onMapReady={handleMapReady} />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -153,6 +235,7 @@ const Map: React.FC = () => {
         textOverlays={textOverlays}
         selectedPosterSize={selectedPosterSize}
         onPosterSizeChange={handlePosterSizeChange}
+        onCapture={handleCapture}
       />
     </div>
   );

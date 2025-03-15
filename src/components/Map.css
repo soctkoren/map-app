@@ -22,6 +22,10 @@
   transition: all 0.3s ease;
 }
 
+.print-viewport.capturing {
+  box-shadow: 0 0 0 2px #007bff;
+}
+
 .print-viewport .leaflet-container {
   width: 100%;
   height: 100%;
@@ -56,6 +60,11 @@
   color: #333;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+
+.capturing .print-size-indicator {
+  opacity: 0;
 }
 
 /* Remove dark theme filters */
@@ -68,6 +77,11 @@
   font-size: 10px;
   background: rgba(255, 255, 255, 0.8) !important;
   color: #666 !important;
+  transition: opacity 0.3s ease;
+}
+
+.capturing .leaflet-control-attribution {
+  opacity: 0;
 }
 
 .leaflet-control-attribution a {
@@ -77,6 +91,11 @@
 /* Ensure controls appear above annotations */
 .leaflet-control {
   z-index: 1001;
+  transition: opacity 0.3s ease;
+}
+
+.capturing .leaflet-control {
+  opacity: 0;
 }
 
 /* Style the zoom controls */

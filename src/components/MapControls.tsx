@@ -9,6 +9,7 @@ interface MapControlsProps {
   textOverlays: TextOverlay[];
   selectedPosterSize: PosterSize;
   onPosterSizeChange: (size: PosterSize) => void;
+  onCapture: () => void;
 }
 
 const POSTER_SIZES: PosterSize[] = [
@@ -25,7 +26,8 @@ const MapControls: React.FC<MapControlsProps> = ({
   onDeleteText,
   textOverlays,
   selectedPosterSize,
-  onPosterSizeChange
+  onPosterSizeChange,
+  onCapture
 }) => {
   const [newText, setNewText] = useState('');
   const [fontSize, setFontSize] = useState(24);
@@ -129,6 +131,9 @@ const MapControls: React.FC<MapControlsProps> = ({
             </div>
           </div>
         )}
+        <button className="capture-btn" onClick={onCapture}>
+          Capture Map
+        </button>
       </div>
     </div>
   );
