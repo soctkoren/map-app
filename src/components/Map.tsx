@@ -147,7 +147,7 @@ const Map: React.FC = () => {
       id: Date.now().toString(),
       text,
       x: rect.width / 2,
-      y: rect.height / 2,
+      y: rect.height * 0.8, // Position at 80% of height (20% from bottom)
       fontSize: style.fontSize,
       color: style.color,
       rotation: style.rotation

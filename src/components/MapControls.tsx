@@ -27,9 +27,20 @@ interface LayerEditorProps {
   overlay: TextOverlay;
   onUpdate: (id: string, text: string, style: TextStyle) => void;
   onClose: () => void;
+  isNew?: boolean;
 }
 
-const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose }) => {
+const DEFAULT_TEXT: TextOverlay = {
+  id: '',
+  text: 'New Text',
+  x: 0,
+  y: 0,
+  fontSize: 100,
+  color: '#000000',
+  rotation: 0
+};
+
+const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, isNew = false }) => {
   const [fontSize, setFontSize] = useState(overlay.fontSize);
   const [textColor, setTextColor] = useState(overlay.color);
   const [rotation, setRotation] = useState(overlay.rotation);
@@ -46,7 +57,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose })
   return (
     <div className="layer-editor-popup">
       <div className="layer-editor-content">
-        <h4>Edit Layer</h4>
+        <h4>{isNew ? 'Add New Text' : 'Edit Layer'}</h4>
         <input
           type="text"
           value={text}
@@ -59,6 +70,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose })
             });
           }}
           placeholder="Enter text..."
+          autoFocus
         />
         <div className="style-controls">
           <input
@@ -132,22 +144,25 @@ const MapControls: React.FC<MapControlsProps> = ({
   selectedMapStyle,
   onMapStyleChange
 }) => {
-  const [newText, setNewText] = useState('');
-  const [fontSize, setFontSize] = useState(24);
-  const [textColor, setTextColor] = useState('#000000');
-  const [rotation, setRotation] = useState(0);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  const [isAddingNewText, setIsAddingNewText] = useState(false);
 
-  const handleAddText = () => {
-    if (newText.trim()) {
-      onAddText(newText, {
-        fontSize,
-        color: textColor,
-        rotation
-      });
-      setNewText('');
-    }
+  const handleStartAddText = () => {
+    const id = Date.now().toString();
+    const newText = { ...DEFAULT_TEXT, id };
+    onAddText(newText.text, {
+      fontSize: newText.fontSize,
+      color: newText.color,
+      rotation: newText.rotation
+    });
+    setSelectedLayerId(id);
+    setIsAddingNewText(true);
+  };
+
+  const handleCloseEditor = () => {
+    setSelectedLayerId(null);
+    setIsAddingNewText(false);
   };
 
   return (
@@ -172,47 +187,13 @@ const MapControls: React.FC<MapControlsProps> = ({
       </div>
 
       <div className="control-section">
-        <h3>Text Controls</h3>
-        <div className="text-input-group">
-          <input
-            type="text"
-            value={newText}
-            onChange={(e) => setNewText(e.target.value)}
-            placeholder="Enter text..."
-          />
-          <div className="style-controls">
-            <input
-              type="number"
-              value={fontSize}
-              onChange={(e) => setFontSize(Number(e.target.value))}
-              min="8"
-              max="72"
-              placeholder="Font size"
-            />
-            <input
-              type="color"
-              value={textColor}
-              onChange={(e) => setTextColor(e.target.value)}
-              title="Text color"
-            />
-            <input
-              type="range"
-              value={rotation}
-              onChange={(e) => setRotation(Number(e.target.value))}
-              min="-180"
-              max="180"
-              title="Rotation"
-            />
-          </div>
-          <div className="text-actions">
-            <button className="add-text-btn" onClick={handleAddText}>
-              Add Text
-            </button>
-          </div>
+        <div className="text-controls-header">
+          <h3>Text Layers</h3>
+          <button className="add-text-btn" onClick={handleStartAddText}>
+            Add Text
+          </button>
         </div>
-
         <div className="text-layers">
-          <h4>Text Layers</h4>
           {textOverlays.map((overlay) => (
             <div
               key={overlay.id}
@@ -280,7 +261,8 @@ const MapControls: React.FC<MapControlsProps> = ({
         <LayerEditor
           overlay={textOverlays.find(o => o.id === selectedLayerId)!}
           onUpdate={onUpdateText}
-          onClose={() => setSelectedLayerId(null)}
+          onClose={handleCloseEditor}
+          isNew={isAddingNewText}
         />
       )}
     </div>
