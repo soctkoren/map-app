@@ -19,6 +19,15 @@ const MapOperations: React.FC<{ onMapReady: (map: L.Map) => void }> = ({ onMapRe
   return null;
 };
 
+interface DragState {
+  isDragging: boolean;
+  startX: number;
+  startY: number;
+  textId: string;
+  textX: number;
+  textY: number;
+}
+
 interface MapControlsProps {
   onAddText: (text: string, style: TextStyle) => void;
   onUpdateText: (id: string, text: string, style: TextStyle) => void;
@@ -45,8 +54,17 @@ const Map: React.FC = () => {
     maxHeight: '100%'
   });
   const [isCapturing, setIsCapturing] = useState(false);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const printViewportRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const dragStateRef = useRef<DragState>({
+    isDragging: false,
+    startX: 0,
+    startY: 0,
+    textId: '',
+    textX: 0,
+    textY: 0
+  });
 
   useEffect(() => {
     const updateViewportSize = () => {
@@ -84,10 +102,10 @@ const Map: React.FC = () => {
   };
 
   const handleAddText = (text: string, style: TextStyle) => {
-    const map = document.querySelector('.leaflet-container');
-    if (!map) return;
+    const container = document.querySelector('.leaflet-container');
+    if (!container) return;
 
-    const rect = map.getBoundingClientRect();
+    const rect = container.getBoundingClientRect();
     const newText: TextOverlay = {
       id: Date.now().toString(),
       text,
@@ -123,6 +141,56 @@ const Map: React.FC = () => {
 
   const handlePosterSizeChange = (size: PosterSize) => {
     setSelectedPosterSize(size);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent, overlay: TextOverlay) => {
+    e.preventDefault();
+    const target = e.currentTarget as SVGTextElement;
+    
+    dragStateRef.current = {
+      isDragging: true,
+      startX: e.clientX,
+      startY: e.clientY,
+      textId: overlay.id,
+      textX: overlay.x,
+      textY: overlay.y
+    };
+
+    setDraggingId(overlay.id);
+
+    // Add event listeners for drag and drop
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!dragStateRef.current.isDragging) return;
+
+    const dx = e.clientX - dragStateRef.current.startX;
+    const dy = e.clientY - dragStateRef.current.startY;
+
+    setTextOverlays(overlays =>
+      overlays.map(overlay =>
+        overlay.id === dragStateRef.current.textId
+          ? {
+              ...overlay,
+              x: dragStateRef.current.textX + dx,
+              y: dragStateRef.current.textY + dy
+            }
+          : overlay
+      )
+    );
+  };
+
+  const handleMouseUp = () => {
+    dragStateRef.current.isDragging = false;
+    setDraggingId(null);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
   };
 
   const handleCapture = async () => {
@@ -212,11 +280,14 @@ const Map: React.FC = () => {
                   y={overlay.y}
                   fontSize={overlay.fontSize}
                   fill={overlay.color}
+                  className={draggingId === overlay.id ? 'dragging' : ''}
                   style={{
                     transform: `rotate(${overlay.rotation}deg)`,
                     cursor: 'move',
                     userSelect: 'none'
                   }}
+                  onMouseDown={(e) => handleMouseDown(e, overlay)}
+                  onContextMenu={handleContextMenu}
                 >
                   {overlay.text}
                 </text>

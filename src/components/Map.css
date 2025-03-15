@@ -46,6 +46,18 @@
   pointer-events: all;
   cursor: move;
   user-select: none;
+  transition: transform 0.1s ease;
+  transform-origin: center;
+  dominant-baseline: middle;
+  text-anchor: middle;
+}
+
+.text-overlay-container text:hover {
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.2));
+}
+
+.text-overlay-container text.dragging {
+  filter: drop-shadow(0 0 4px rgba(0, 123, 255, 0.4));
 }
 
 .print-size-indicator {
