@@ -64,6 +64,31 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
   const [text, setText] = useState(overlay.text);
   const [fontFamily, setFontFamily] = useState(overlay.fontFamily || 'Roboto');
 
+  // Function to snap rotation to common angles
+  const snapRotation = (value: number): number => {
+    const snapPoints = [0, 45, 90, 135, 180, -180, -135, -90, -45];
+    const snapThreshold = 5; // Degrees within which to snap
+
+    for (const point of snapPoints) {
+      if (Math.abs(value - point) <= snapThreshold) {
+        return point;
+      }
+    }
+    return value;
+  };
+
+  const handleRotationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newRotation = Number(e.target.value);
+    const snappedRotation = snapRotation(newRotation);
+    setRotation(snappedRotation);
+    onUpdate(overlay.id, text, {
+      fontSize,
+      color: textColor,
+      rotation: snappedRotation,
+      fontFamily
+    });
+  };
+
   const handleUpdate = () => {
     onUpdate(overlay.id, text, {
       fontSize,
@@ -141,25 +166,50 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
             }}
             title="Text color"
           />
-          <input
-            type="range"
-            value={rotation}
-            onChange={(e) => {
-              const newRotation = Number(e.target.value);
-              setRotation(newRotation);
-              onUpdate(overlay.id, text, {
-                fontSize,
-                color: textColor,
-                rotation: newRotation,
-                fontFamily
-              });
-            }}
-            min="-180"
-            max="180"
-            step="1"
-            title={`Rotation: ${rotation}°`}
-            className="rotation-slider"
-          />
+          <div className="rotation-control">
+            <div className="rotation-label">
+              <span>Rotation: {rotation}°</span>
+              <button 
+                className="reset-rotation"
+                onClick={() => {
+                  setRotation(0);
+                  onUpdate(overlay.id, text, {
+                    fontSize,
+                    color: textColor,
+                    rotation: 0,
+                    fontFamily
+                  });
+                }}
+              >
+                Reset
+              </button>
+            </div>
+            <div className="rotation-slider-container">
+              <div className="angle-markers">
+                <span>-180°</span>
+                <span>-90°</span>
+                <span>0°</span>
+                <span>90°</span>
+                <span>180°</span>
+              </div>
+              <input
+                type="range"
+                value={rotation}
+                onChange={handleRotationChange}
+                min="-180"
+                max="180"
+                step="1"
+                className="rotation-slider"
+              />
+              <div className="angle-ticks">
+                <div className="tick" style={{ left: '0%' }}></div>
+                <div className="tick" style={{ left: '25%' }}></div>
+                <div className="tick" style={{ left: '50%' }}></div>
+                <div className="tick" style={{ left: '75%' }}></div>
+                <div className="tick" style={{ left: '100%' }}></div>
+              </div>
+            </div>
+          </div>
         </div>
         <button className="close-editor-btn" onClick={onClose}>
           Done
