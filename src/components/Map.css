@@ -1,19 +1,17 @@
 .map-page {
   display: flex;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   overflow: hidden;
 }
 
 .map-container {
-  width: calc(100vw - 300px);
-  height: 100vh;
-  position: relative;
+  flex: 1;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background: #f0f0f0;
-  overflow: hidden;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 20px;
 }
 
 .map-controls {
@@ -27,19 +25,19 @@
 
 .print-viewport {
   position: relative;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .print-viewport.capturing {
-  box-shadow: 0 0 0 2px #007bff;
+  box-shadow: none;
 }
 
 .print-viewport .leaflet-container {
-  width: 100%;
-  height: 100%;
-  z-index: 1;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .text-overlay-container {
@@ -53,21 +51,61 @@
 }
 
 .text-overlay-container text {
-  pointer-events: all;
-  cursor: move;
-  user-select: none;
-  transition: transform 0.1s ease;
-  transform-origin: center;
-  dominant-baseline: middle;
-  text-anchor: middle;
-}
-
-.text-overlay-container text:hover {
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.2));
+  pointer-events: auto;
 }
 
 .text-overlay-container text.dragging {
-  filter: drop-shadow(0 0 4px rgba(0, 123, 255, 0.4));
+  opacity: 0.7;
+}
+
+/* Override leaflet control styles to match rounded corners */
+.print-viewport .leaflet-control-container .leaflet-top,
+.print-viewport .leaflet-control-container .leaflet-bottom {
+  z-index: 1001;
+}
+
+.print-viewport .leaflet-control-container .leaflet-top.leaflet-left {
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
+.print-viewport .leaflet-control-container .leaflet-top.leaflet-right {
+  margin-top: 12px;
+  margin-right: 12px;
+}
+
+.print-viewport .leaflet-control-container .leaflet-bottom.leaflet-left {
+  margin-bottom: 12px;
+  margin-left: 12px;
+}
+
+.print-viewport .leaflet-control-container .leaflet-bottom.leaflet-right {
+  margin-bottom: 12px;
+  margin-right: 12px;
+}
+
+/* Style the Leaflet controls to match the design */
+.print-viewport .leaflet-control {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.print-viewport .leaflet-bar {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.print-viewport .leaflet-bar a {
+  background-color: white;
+  border-bottom: 1px solid #eee;
+}
+
+.print-viewport .leaflet-bar a:last-child {
+  border-bottom: none;
+}
+
+.print-viewport .leaflet-bar a:hover {
+  background-color: #f8f8f8;
 }
 
 .print-size-indicator {

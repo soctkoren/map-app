@@ -343,12 +343,15 @@
   border-radius: 8px;
   width: 300px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  transform: translateX(-150px); /* Offset by half the width of the sidebar */
 }
 
 .layer-editor-content h4 {
   margin: 0 0 15px 0;
-  color: #333;
   font-size: 16px;
+  font-weight: 500;
+  color: #333;
 }
 
 .layer-editor-content input[type="text"] {
@@ -360,20 +363,27 @@
   font-size: 14px;
 }
 
+.layer-editor-content input[type="text"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
 .layer-editor-content .style-controls {
   margin-bottom: 20px;
 }
 
 .close-editor-btn {
   width: 100%;
-  padding: 10px;
+  padding: 8px 16px;
   background: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s;
+  margin-top: 15px;
+  transition: background-color 0.2s ease;
 }
 
 .close-editor-btn:hover {

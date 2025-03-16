@@ -10,6 +10,50 @@ import MapControls from './MapControls';
 const DEFAULT_CENTER: L.LatLngTuple = [51.505, -0.09];
 const DEFAULT_ZOOM = 13;
 
+// Function to load Google Font
+const loadGoogleFont = async (fontFamily: string) => {
+  try {
+    // Create a new link element for the font
+    const link = document.createElement('link');
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontFamily)}:wght@400;700&display=swap`;
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    // Create a span to test font loading
+    const testSpan = document.createElement('span');
+    testSpan.style.fontFamily = fontFamily;
+    testSpan.style.position = 'absolute';
+    testSpan.style.visibility = 'hidden';
+    testSpan.textContent = 'Test Font Loading';
+    document.body.appendChild(testSpan);
+
+    // Wait for font to load with timeout
+    await Promise.race([
+      document.fonts.load(`700 16px "${fontFamily}"`),
+      document.fonts.load(`400 16px "${fontFamily}"`),
+      new Promise(resolve => setTimeout(resolve, 3000)) // 3s timeout
+    ]);
+
+    // Cleanup test span
+    document.body.removeChild(testSpan);
+  } catch (error) {
+    console.error(`Error loading font ${fontFamily}:`, error);
+  }
+};
+
+// Available Google Fonts
+export const AVAILABLE_FONTS = [
+  'Roboto',
+  'Open Sans',
+  'Lato',
+  'Montserrat',
+  'Raleway',
+  'Poppins',
+  'Playfair Display',
+  'Source Sans Pro',
+  'ABeeZee'
+];
+
 // Available map styles from OpenMapTiles
 export const MAP_STYLES: MapStyle[] = [
   {
@@ -141,19 +185,19 @@ const Map: React.FC = () => {
   };
 
   const handleAddText = (text: string, style: TextStyle) => {
-    const container = document.querySelector('.leaflet-container');
-    if (!container) return;
+    const viewport = printViewportRef.current;
+    if (!viewport) return;
 
-    const rect = container.getBoundingClientRect();
+    const rect = viewport.getBoundingClientRect();
     const newText: TextOverlay = {
       id: Date.now().toString(),
-      text,
+      text: text || '',
       x: rect.width / 2,
       y: rect.height * 0.8, // Position at 80% of height (20% from bottom)
-      fontSize: style.fontSize,
-      color: style.color,
-      rotation: style.rotation,
-      fontFamily: style.fontFamily
+      fontSize: style?.fontSize || 100,
+      color: style?.color || '#000000',
+      rotation: style?.rotation || 0,
+      fontFamily: style?.fontFamily || 'Roboto'
     };
 
     setTextOverlays([...textOverlays, newText]);
@@ -238,6 +282,11 @@ const Map: React.FC = () => {
     e.preventDefault();
   };
 
+  // Load fonts when component mounts
+  useEffect(() => {
+    AVAILABLE_FONTS.forEach(loadGoogleFont);
+  }, []);
+
   const handleCapture = async () => {
     if (!printViewportRef.current || !mapInstanceRef.current) return;
     setIsCapturing(true);
@@ -245,6 +294,13 @@ const Map: React.FC = () => {
     try {
       // Wait for capturing class transition
       await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Pre-load all fonts before capture
+      const uniqueFonts = [...new Set(textOverlays.map(overlay => overlay.fontFamily))];
+      await Promise.all(uniqueFonts.map(loadGoogleFont));
+
+      // Additional wait to ensure fonts are applied
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const viewport = printViewportRef.current;
       const map = mapInstanceRef.current;
@@ -265,7 +321,7 @@ const Map: React.FC = () => {
         width: viewportRect.width,
         height: viewportRect.height,
         backgroundColor: null,
-        logging: false,
+        logging: true, // Enable logging for debugging
         useCORS: true,
         allowTaint: true,
         onclone: (clonedDoc) => {
@@ -277,11 +333,42 @@ const Map: React.FC = () => {
               (control as HTMLElement).style.display = 'none';
             });
 
-            // Scale text overlays
+            // Scale text overlays and preserve font properties
             const texts = clonedViewport.querySelectorAll('text');
             texts.forEach((text) => {
-              const fontSize = parseFloat(text.getAttribute('font-size') || '24');
-              text.setAttribute('font-size', `${fontSize * scale}px`);
+              const textElement = text as SVGTextElement;
+              const x = parseFloat(textElement.getAttribute('x') || '0');
+              const y = parseFloat(textElement.getAttribute('y') || '0');
+              
+              const overlay = textOverlays.find(o => 
+                o.text === textElement.textContent &&
+                Math.abs(o.x - x) < 1 &&
+                Math.abs(o.y - y) < 1
+              );
+              
+              if (overlay) {
+                const fontSize = parseFloat(textElement.getAttribute('font-size') || '24');
+                
+                // Apply font properties more aggressively
+                const fontFamily = `"${overlay.fontFamily}", ${overlay.fontFamily}, sans-serif`;
+                textElement.setAttribute('font-size', `${fontSize * scale}px`);
+                textElement.setAttribute('font-family', fontFamily);
+                textElement.style.setProperty('font-family', fontFamily, 'important');
+                
+                // Force font rendering
+                textElement.style.setProperty('-webkit-font-smoothing', 'antialiased', 'important');
+                textElement.style.setProperty('text-rendering', 'optimizeLegibility', 'important');
+                
+                // Ensure other properties are preserved
+                textElement.setAttribute('fill', overlay.color);
+                textElement.style.setProperty('transform', `rotate(${overlay.rotation}deg)`, 'important');
+                textElement.style.setProperty('text-anchor', 'middle', 'important');
+                textElement.style.setProperty('dominant-baseline', 'middle', 'important');
+                
+                console.log('Applying font:', fontFamily, 'to text:', overlay.text);
+              } else {
+                console.warn('No matching overlay found for text:', textElement.textContent);
+              }
             });
           }
         }
@@ -317,7 +404,18 @@ const Map: React.FC = () => {
               attribution={selectedMapStyle.attribution}
               url={selectedMapStyle.url}
             />
-            <svg className="text-overlay-container">
+            <svg 
+              className="text-overlay-container" 
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                position: 'absolute', 
+                top: 0, 
+                left: 0, 
+                pointerEvents: 'none',
+                overflow: 'visible'
+              }}
+            >
               {textOverlays.map((overlay) => (
                 <text
                   key={overlay.id}
@@ -330,7 +428,11 @@ const Map: React.FC = () => {
                     transform: `rotate(${overlay.rotation}deg)`,
                     cursor: 'move',
                     userSelect: 'none',
-                    fontFamily: overlay.fontFamily
+                    fontFamily: overlay.fontFamily,
+                    transformOrigin: 'center',
+                    dominantBaseline: 'middle',
+                    textAnchor: 'middle',
+                    pointerEvents: 'auto'
                   }}
                   onMouseDown={(e) => handleMouseDown(e, overlay)}
                   onContextMenu={handleContextMenu}
