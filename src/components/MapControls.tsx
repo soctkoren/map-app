@@ -239,6 +239,7 @@ const MapControls: React.FC<MapControlsProps> = ({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const [showSizes, setShowSizes] = useState(false);
 
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
@@ -435,17 +436,35 @@ const MapControls: React.FC<MapControlsProps> = ({
         </button>
       </div>
 
-      <a
-        href="https://www.paypal.com/donate/?business=W7PELRRREYBSU&no_recurring=0&item_name=Takes+for+supporting+my+channel+via+this+donation%21&currency_code=USD"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="donate-button"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M20.067 8.478c.492.315.844.825.983 1.39.185.716.173 1.485-.043 2.197-.404 1.35-1.168 2.517-2.285 3.523-1.922 1.746-4.193 2.467-6.92 2.467h-2.726l-.8 5.09H5.266l.07-.43.627-4.01.13-.75.15-.95h2.495c1.285 0 2.487-.196 3.59-.594 2.156-.774 3.72-2.19 4.723-4.238.448-.917.743-1.904.856-2.89.067-.47.043-.93-.064-1.366-.102-.354-.27-.668-.576-.956z M18.956 6.172c.282.65.392 1.365.328 2.09-.095 1.09-.456 2.152-1.07 3.19-1.082 1.82-2.594 3.076-4.523 3.77-1.04.376-2.142.57-3.34.57h-3.23l-.8 5.09H3.31l.07-.43 1.06-6.76.13-.75.147-.95h2.995c1.285 0 2.487-.196 3.59-.594 2.156-.774 3.72-2.19 4.723-4.238.448-.917.743-1.904.856-2.89.067-.47.043-.93-.064-1.366-.102-.354-.27-.668-.576-.956.492.315.844.825.983 1.39.185.716.173 1.485-.043 2.197-.404 1.35-1.168 2.517-2.285 3.523.173-.033.348-.073.52-.118z"/>
-        </svg>
-        <span>Buy me a coffee</span>
-      </a>
+      <div className={`social-buttons ${showSizeSelector ? 'hidden' : ''}`}>
+        <img 
+          src="/me.jpeg" 
+          alt="Jonny K" 
+          className="profile-image"
+        />
+        <a href="https://www.paypal.com/donate/?business=W7PELRRREYBSU&no_recurring=0&item_name=Thanks+for+supporting+my+work+%3A%29&currency_code=USD" className="donate-button" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 19H20L19.5 21H4.5L4 19Z" fill="currentColor" />
+            <path d="M18 4H6V13C6 15.7614 8.23858 18 11 18H13C15.7614 18 18 15.7614 18 13V4Z" fill="currentColor" />
+            <path d="M18 4H20V9C20 10.1046 19.1046 11 18 11V4Z" fill="currentColor" />
+          </svg>
+          Buy me a coffee
+        </a>
+        <div className="social-row">
+          <a href="https://www.youtube.com/@jonnykvids" className="youtube-button" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.5 6.2C23.3 5.4 22.7 4.8 22 4.6C20.1 4 12 4 12 4C12 4 3.9 4 2 4.6C1.3 4.8 0.7 5.4 0.5 6.2C0 8.1 0 12 0 12C0 12 0 15.9 0.5 17.8C0.7 18.6 1.3 19.2 2 19.4C3.9 20 12 20 12 20C12 20 20.1 20 22 19.4C22.7 19.2 23.3 18.6 23.5 17.8C24 15.9 24 12 24 12C24 12 24 8.1 23.5 6.2ZM9.5 15.5V8.5L16 12L9.5 15.5Z" fill="currentColor"/>
+            </svg>
+            YouTube
+          </a>
+          <a href="https://www.linkedin.com/in/jonnykvids/" className="linkedin-button" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z" fill="currentColor"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
 
       {selectedLayerId && (
         <LayerEditor
