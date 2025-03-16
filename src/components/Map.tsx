@@ -559,6 +559,31 @@ const Map: React.FC = () => {
           ref={printViewportRef}
           style={viewportStyle}
         >
+          <div 
+            className={`help-tooltip ${isCapturing ? 'capturing' : ''}`}
+            data-tooltip="Welcome to Momenti Maps! 👋
+
+🗺️ Getting Started:
+1. Search for your location in the search bar
+2. Choose your preferred map style
+3. Add text or icons to your map
+4. Customize size, color, and rotation
+5. Drag elements to position them
+
+💡 Pro Tips:
+• Text will snap to center when dragged near
+• Use the size slider to adjust text/icon scale
+• Try different map styles for unique looks
+• Choose from various poster sizes
+
+📸 When you're done:
+Click 'Capture Map' to download your creation!"
+          >
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" fill="currentColor"/>
+            </svg>
+          </div>
+
           <MapContainer
             center={DEFAULT_CENTER}
             zoom={DEFAULT_ZOOM}
