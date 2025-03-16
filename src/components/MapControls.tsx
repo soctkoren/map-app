@@ -37,6 +37,7 @@ interface LayerEditorProps {
   onUpdate: (id: string, text: string, style: TextStyle) => void;
   onClose: () => void;
   isNew?: boolean;
+  position?: number | null;
 }
 
 const AVAILABLE_FONTS = [
@@ -58,7 +59,7 @@ const DEFAULT_TEXT: TextOverlay = {
   fontFamily: 'Roboto'
 };
 
-const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, isNew = false }) => {
+const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, isNew = false, position }) => {
   const [fontSize, setFontSize] = useState(overlay.fontSize);
   const [textColor, setTextColor] = useState(overlay.color);
   const [rotation, setRotation] = useState(overlay.rotation);
@@ -101,69 +102,80 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
 
   return (
     <div className="layer-editor-popup">
-      <div className="layer-editor-content">
+      <div 
+        className="layer-editor-content"
+        style={position ? { top: position } : undefined}
+      >
         <h4>{isNew ? (overlay.isSvg ? 'Add New Icon' : 'Add New Text') : 'Edit Layer'}</h4>
         
         {!overlay.isSvg && (
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => {
-              setText(e.target.value);
-              onUpdate(overlay.id, e.target.value, {
-                fontSize,
-                color: textColor,
-                rotation,
-                fontFamily
-              });
-            }}
-            placeholder="Enter text..."
-            autoFocus
-          />
+          <div className="field-group">
+            <label className="field-label">Text</label>
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value);
+                onUpdate(overlay.id, e.target.value, {
+                  fontSize,
+                  color: textColor,
+                  rotation,
+                  fontFamily
+                });
+              }}
+              placeholder="Enter text..."
+              autoFocus
+            />
+          </div>
         )}
 
         <div className="style-controls">
           {!overlay.isSvg && (
             <>
-              <select
-                value={fontFamily}
-                onChange={(e) => {
-                  setFontFamily(e.target.value);
-                  onUpdate(overlay.id, text, {
-                    fontSize,
-                    color: textColor,
-                    rotation,
-                    fontFamily: e.target.value
-                  });
-                }}
-                className="font-select"
-              >
-                {AVAILABLE_FONTS.map(font => (
-                  <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
-                    {font.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                value={fontSize}
-                onChange={(e) => {
-                  const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
-                  if (!isNaN(newSize)) {
-                    setFontSize(newSize);
+              <div className="field-group">
+                <label className="field-label">Font Family</label>
+                <select
+                  value={fontFamily}
+                  onChange={(e) => {
+                    setFontFamily(e.target.value);
                     onUpdate(overlay.id, text, {
-                      fontSize: newSize,
+                      fontSize,
                       color: textColor,
                       rotation,
-                      fontFamily
+                      fontFamily: e.target.value
                     });
-                  }
-                }}
-                min="0"
-                max="200"
-                step="1"
-                placeholder="Font size"
-              />
+                  }}
+                  className="font-select"
+                >
+                  {AVAILABLE_FONTS.map(font => (
+                    <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                      {font.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="field-group">
+                <label className="field-label">Font Size</label>
+                <input
+                  type="number"
+                  value={fontSize}
+                  onChange={(e) => {
+                    const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
+                    if (!isNaN(newSize)) {
+                      setFontSize(newSize);
+                      onUpdate(overlay.id, text, {
+                        fontSize: newSize,
+                        color: textColor,
+                        rotation,
+                        fontFamily
+                      });
+                    }
+                  }}
+                  min="0"
+                  max="200"
+                  step="1"
+                />
+              </div>
             </>
           )}
           
@@ -249,10 +261,11 @@ const MapControls: React.FC<MapControlsProps> = ({
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [isAddingNewText, setIsAddingNewText] = useState(false);
+  const [editorPosition, setEditorPosition] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [showSizes, setShowSizes] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
 
@@ -291,6 +304,13 @@ const MapControls: React.FC<MapControlsProps> = ({
     setSearchQuery(result.display_name);
     setSearchResults([]);
     onLocationChange(parseFloat(result.lat), parseFloat(result.lon));
+  };
+
+  const handleEditLayer = (id: string, event: React.MouseEvent<HTMLButtonElement>) => {
+    const buttonRect = event.currentTarget.getBoundingClientRect();
+    setEditorPosition(buttonRect.top);
+    setSelectedLayerId(id);
+    setIsAddingNewText(false);
   };
 
   const handleStartAddText = () => {
@@ -409,10 +429,7 @@ const MapControls: React.FC<MapControlsProps> = ({
                 <div className="layer-actions">
                   <button
                     className="edit-layer-btn"
-                    onClick={() => {
-                      setSelectedLayerId(overlay.id);
-                      setIsAddingNewText(false);
-                    }}
+                    onClick={(e) => handleEditLayer(overlay.id, e)}
                     aria-label="Edit layer"
                   >
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -454,6 +471,7 @@ const MapControls: React.FC<MapControlsProps> = ({
           onUpdate={onUpdateText}
           onClose={handleCloseEditor}
           isNew={isAddingNewText}
+          position={editorPosition}
         />
       )}
     </div>
