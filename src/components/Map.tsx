@@ -111,6 +111,8 @@ interface MapControlsProps {
   mapStyles: MapStyle[];
   selectedMapStyle: MapStyle;
   onMapStyleChange: (style: MapStyle) => void;
+  currentBackground: { url: string; credit: string; description: string };
+  onBackgroundChange: (background: { url: string; credit: string; description: string }) => void;
 }
 
 const Map: React.FC = () => {
@@ -125,6 +127,11 @@ const Map: React.FC = () => {
   const [selectedMapStyle, setSelectedMapStyle] = useState<MapStyle>(
     MAP_STYLES.find(style => style.name === 'Positron') || MAP_STYLES[0]
   );
+  const [currentBackground, setCurrentBackground] = useState({
+    url: 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7',
+    credit: 'Nathan Anderson',
+    description: 'Mountain camping at night'
+  });
   const [viewportStyle, setViewportStyle] = useState({
     width: '100%',
     height: '100%',
@@ -471,9 +478,18 @@ const Map: React.FC = () => {
     );
   };
 
+  // Update the background image with proper query parameters
+  const backgroundUrl = `${currentBackground.url}?auto=format&fit=crop&w=2000&q=80`;
+
   return (
     <div className="map-page">
-      <div className="map-container">
+      <div 
+        className="map-container"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
+            url('${backgroundUrl}')`
+        }}
+      >
         <div
           className={`print-viewport ${isCapturing ? 'capturing' : ''}`}
           ref={printViewportRef}
@@ -543,6 +559,8 @@ const Map: React.FC = () => {
         mapStyles={MAP_STYLES}
         selectedMapStyle={selectedMapStyle}
         onMapStyleChange={handleMapStyleChange}
+        currentBackground={currentBackground}
+        onBackgroundChange={setCurrentBackground}
       />
     </div>
   );

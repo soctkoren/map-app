@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { PosterSize, TextOverlay, TextStyle, MapStyle } from '../types';
 import './MapControls.css';
+import { backgrounds } from './BackgroundGallery';
 
 interface MapControlsProps {
   onAddText: (text: string, style: TextStyle) => void;
@@ -13,6 +14,8 @@ interface MapControlsProps {
   mapStyles: MapStyle[];
   selectedMapStyle: MapStyle;
   onMapStyleChange: (style: MapStyle) => void;
+  currentBackground: { url: string; credit: string; description: string };
+  onBackgroundChange: (background: { url: string; credit: string; description: string }) => void;
 }
 
 const POSTER_SIZES: PosterSize[] = [
@@ -171,7 +174,9 @@ const MapControls: React.FC<MapControlsProps> = ({
   onCapture,
   mapStyles,
   selectedMapStyle,
-  onMapStyleChange
+  onMapStyleChange,
+  currentBackground,
+  onBackgroundChange
 }) => {
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
@@ -260,7 +265,6 @@ const MapControls: React.FC<MapControlsProps> = ({
         </div>
         <div className="current-size-info">
           <span className="size-name">{selectedPosterSize.name}</span>
-          <span className="size-dimensions">({selectedPosterSize.width}" × {selectedPosterSize.height}")</span>
           <span className="size-pixels">{selectedPosterSize.pixelWidth} × {selectedPosterSize.pixelHeight}px</span>
         </div>
         {showSizeSelector && (
@@ -292,6 +296,28 @@ const MapControls: React.FC<MapControlsProps> = ({
         </button>
       </div>
 
+      <div className="control-section">
+        <h3>Background</h3>
+        <div className="background-gallery">
+          {backgrounds.map((bg: { url: string; credit: string; description: string }) => (
+            <button
+              key={bg.url}
+              onClick={() => onBackgroundChange(bg)}
+              className={`w-12 h-12 rounded-lg overflow-hidden transition-all ${
+                currentBackground.url === bg.url ? 'ring-2 ring-blue-500 scale-110' : 'opacity-50 hover:opacity-100'
+              }`}
+              title={`${bg.description} by ${bg.credit}`}
+            >
+              <img
+                src={`${bg.url}?auto=format&fit=crop&w=100&q=60`}
+                alt={bg.description}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
       {selectedLayerId && (
         <LayerEditor
           overlay={textOverlays.find(o => o.id === selectedLayerId)!}
@@ -310,7 +336,7 @@ const MapControls: React.FC<MapControlsProps> = ({
         <svg viewBox="0 0 24 24">
           <path d="M20.067 8.478c.492.315.844.825.983 1.39.185.716.173 1.485-.043 2.197-.404 1.35-1.168 2.517-2.285 3.523-1.922 1.746-4.193 2.467-6.92 2.467h-2.726l-.8 5.09H5.266l.07-.43.627-4.01.13-.75.15-.95h2.495c1.285 0 2.487-.196 3.59-.594 2.156-.774 3.72-2.19 4.723-4.238.448-.917.743-1.904.856-2.89.067-.47.043-.93-.064-1.366-.102-.354-.27-.668-.576-.956z M18.956 6.172c.282.65.392 1.365.328 2.09-.095 1.09-.456 2.152-1.07 3.19-1.082 1.82-2.594 3.076-4.523 3.77-1.04.376-2.142.57-3.34.57h-3.23l-.8 5.09H3.31l.07-.43 1.06-6.76.13-.75.147-.95h2.995c1.285 0 2.487-.196 3.59-.594 2.156-.774 3.72-2.19 4.723-4.238.448-.917.743-1.904.856-2.89.067-.47.043-.93-.064-1.366-.102-.354-.27-.668-.576-.956.492.315.844.825.983 1.39.185.716.173 1.485-.043 2.197-.404 1.35-1.168 2.517-2.285 3.523.173-.033.348-.073.52-.118z"/>
         </svg>
-        <span>Buy me a coffee ☕</span>
+        <span>Buy me a coffee</span>
       </a>
     </div>
   );
