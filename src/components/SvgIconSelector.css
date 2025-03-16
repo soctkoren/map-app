@@ -1,5 +1,57 @@
 .svg-icon-selector {
-  margin-top: 16px;
+  width: 100%;
+  margin: 8px 0;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.icon-button:active {
+  transform: translateY(0);
+}
+
+.icon-preview {
+  width: 24px;
+  height: 24px;
+  color: #0066FF;
+}
+
+.icon-name {
+  font-size: 12px;
+  color: #4a5568;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* Ensure proper spacing in the MapControls layout */
+.text-controls-header .svg-icon-selector {
+  margin-top: 0;
 }
 
 .add-icon-btn {
@@ -22,10 +74,4 @@
 .add-icon-btn:hover {
   background: #0052CC;
   transform: translateY(-1px);
-}
-
-.icon-preview {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
 } 

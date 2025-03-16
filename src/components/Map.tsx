@@ -244,19 +244,24 @@ const Map: React.FC = () => {
     const rect = viewport.getBoundingClientRect();
     const newText: TextOverlay = {
       id: Date.now().toString(),
-      text: text || '',
-      x: rect.width / 2,
-      y: rect.height * 0.8,
-      fontSize: style?.fontSize || (style?.isEmoji ? 48 : 100),
-      color: style?.color || '#000000',
-      rotation: style?.rotation || 0,
-      fontFamily: style?.fontFamily || 'Roboto',
-      isEmoji: style?.isEmoji || false,
-      isSvg: style?.isSvg || false,
-      svgPath: style?.isSvg ? text : undefined
+      text: style.isSvg ? '' : (text || ''),
+      x: rect.width / 2,  // Center horizontally
+      y: style.isSvg ? rect.height / 2 : rect.height * 0.8,  // Place icons in center, text near bottom
+      fontSize: style.fontSize || (style.isEmoji ? 48 : 100),
+      color: style.color || '#0066FF',  // Default to blue for icons
+      rotation: style.rotation || 0,
+      fontFamily: style.fontFamily || 'Roboto',
+      isEmoji: style.isEmoji || false,
+      isSvg: style.isSvg || false,
+      svgPath: style.isSvg ? text : undefined
     };
 
-    setTextOverlays([...textOverlays, newText]);
+    setTextOverlays(prevOverlays => [...prevOverlays, newText]);
+
+    // Select the newly added overlay for editing
+    if (style.isSvg) {
+      setDraggingId(newText.id);
+    }
   };
 
   const handleUpdateText = (id: string, text: string, style: TextStyle) => {
@@ -265,7 +270,8 @@ const Map: React.FC = () => {
         overlay.id === id
           ? {
               ...overlay,
-              text,
+              text: style.isSvg ? overlay.text : text,
+              svgPath: style.isSvg ? text : overlay.svgPath,
               fontSize: style.fontSize,
               color: style.color,
               rotation: style.rotation,
@@ -572,8 +578,10 @@ const Map: React.FC = () => {
                 top: 0, 
                 left: 0, 
                 pointerEvents: 'none',
-                overflow: 'visible'
+                overflow: 'visible',
+                zIndex: 1000
               }}
+              viewBox={`0 0 ${printViewportRef.current?.clientWidth || 100} ${printViewportRef.current?.clientHeight || 100}`}
             >
               {renderCenterGuides()}
               
@@ -581,7 +589,7 @@ const Map: React.FC = () => {
                 overlay.isSvg ? (
                   <g
                     key={overlay.id}
-                    transform={`translate(${overlay.x}, ${overlay.y}) rotate(${overlay.rotation}) scale(${overlay.fontSize / 24})`}
+                    transform={`translate(${overlay.x}, ${overlay.y})`}
                     style={{
                       cursor: 'move',
                       pointerEvents: 'auto'
@@ -593,6 +601,11 @@ const Map: React.FC = () => {
                       d={overlay.svgPath}
                       fill={overlay.color}
                       className={draggingId === overlay.id ? 'dragging' : ''}
+                      style={{
+                        transformOrigin: 'center bottom',
+                        transform: `rotate(${overlay.rotation}deg) scale(${overlay.fontSize / 24})`,
+                        transformBox: 'fill-box'
+                      }}
                     />
                   </g>
                 ) : (
