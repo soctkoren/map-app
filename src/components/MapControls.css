@@ -9,6 +9,42 @@
   box-shadow: -4px 0 16px rgba(0, 0, 0, 0.03);
 }
 
+.site-title {
+  margin: 0 0 32px 0;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.site-title .logo {
+  width: 32px;
+  height: 32px;
+  color: #0066FF;
+  flex-shrink: 0;
+}
+
+.site-title .title-text {
+  flex: 1;
+}
+
+.site-title h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.site-title p {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #666;
+  letter-spacing: -0.1px;
+}
+
 .control-section {
   margin-bottom: 32px;
   padding: 0;
@@ -595,7 +631,7 @@
 
 .search-input {
   width: 100%;
-  padding: 12px 42px 12px 16px;
+  padding: 12px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
@@ -616,21 +652,17 @@
   top: 50%;
   transform: translateY(-50%);
   color: #718096;
-  font-size: 12px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: 6px;
-  pointer-events: none;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2px 6px;
-  border-radius: 4px;
 }
 
 .search-loading::after {
   content: '';
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border: 2px solid #e2e8f0;
   border-top-color: #4299e1;
   border-radius: 50%;
