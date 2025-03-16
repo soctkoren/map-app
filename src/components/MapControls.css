@@ -585,7 +585,7 @@
 .layer-editor-content {
   position: fixed;
   background: white;
-  padding: 24px;
+  padding: 16px;
   border-radius: 20px;
   width: 420px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
@@ -593,131 +593,92 @@
   transform: translateY(-50%);
   pointer-events: auto;
   animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  max-height: min(calc(100vh - 40px), 600px); /* Cap height and ensure padding */
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* Ensure the pointer arrow stays visible */
-.layer-editor-content::after {
-  content: '';
-  position: absolute;
-  right: -8px;
-  top: 50%;
-  width: 16px;
-  height: 16px;
-  background: white;
-  transform: translateY(-50%) rotate(45deg);
-  box-shadow: 4px -4px 8px rgba(0, 0, 0, 0.05);
-  pointer-events: none; /* Prevent pointer from interfering with scrolling */
+  overflow: hidden;
 }
 
 .layer-editor-content h4 {
-  margin: 0 0 20px 0;
-  font-size: 20px;
+  margin: 0 0 12px 0;
+  font-size: 18px;
   font-weight: 600;
   color: #1a1a1a;
   letter-spacing: -0.5px;
 }
 
 .layer-editor-content .field-group {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .layer-editor-content .field-label {
   display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
+  margin-bottom: 4px;
+  font-size: 13px;
   font-weight: 500;
   color: #4a5568;
 }
 
-.layer-editor-content .field-label .instruction-text {
-  font-weight: normal;
-  color: #718096;
-  font-size: 13px;
-  margin-left: 4px;
-}
-
 .layer-editor-content textarea,
-.layer-editor-content input[type="text"] {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 15px;
-  line-height: 1.4;
-  resize: none;
-  height: 44px;
-  min-height: unset;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.layer-editor-content textarea:focus,
-.layer-editor-content input[type="text"]:focus {
-  border-color: #0066FF;
-  box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
-  outline: none;
-}
-
+.layer-editor-content input[type="text"],
 .layer-editor-content .font-select {
   width: 100%;
-  padding: 12px;
+  padding: 8px 12px;
   border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 15px;
-  background: white;
-  cursor: pointer;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  height: 36px;
   transition: all 0.2s ease;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%234A5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 36px;
+  font-family: inherit;
 }
 
 .layer-editor-content .style-controls {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.layer-editor-content .style-control {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.layer-editor-content .style-control label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #4a5568;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .layer-editor-content input[type="color"] {
   width: 100%;
-  height: 40px;
-  padding: 4px;
+  height: 36px;
+  padding: 2px;
   border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.rotation-control {
+  margin: 8px 0;
+}
+
+.rotation-label {
+  margin-bottom: 8px;
+}
+
+.reset-rotation {
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.rotation-slider-container {
+  padding: 8px 0;
 }
 
 .layer-editor-content .close-editor-btn {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 12px;
   background: #0066FF;
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 20px;
+}
+
+.layer-editor-content .close-editor-btn:hover {
+  background: #0052CC;
+  transform: translateY(-1px);
 }
 
 @keyframes slideIn {
