@@ -40,13 +40,13 @@ const AVAILABLE_FONTS = [
 
 const DEFAULT_TEXT: TextOverlay = {
   id: '',
-  text: 'New Text',
+  text: '',
   x: 0,
   y: 0,
   fontSize: 100,
   color: '#000000',
   rotation: 0,
-  fontFamily: 'ABeeZee'
+  fontFamily: 'Roboto'
 };
 
 const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, isNew = false }) => {
@@ -54,7 +54,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
   const [textColor, setTextColor] = useState(overlay.color);
   const [rotation, setRotation] = useState(overlay.rotation);
   const [text, setText] = useState(overlay.text);
-  const [fontFamily, setFontFamily] = useState(overlay.fontFamily || 'ABeeZee');
+  const [fontFamily, setFontFamily] = useState(overlay.fontFamily || 'Roboto');
 
   const handleUpdate = () => {
     onUpdate(overlay.id, text, {
@@ -104,71 +104,54 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
               </option>
             ))}
           </select>
-          <div className="control-group">
-            <label htmlFor="fontSize">Font Size</label>
-            <input
-              id="fontSize"
-              type="number"
-              value={fontSize}
-              onChange={(e) => {
-                const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
-                if (!isNaN(newSize)) {
-                  setFontSize(newSize);
-                  onUpdate(overlay.id, text, {
-                    fontSize: newSize,
-                    color: textColor,
-                    rotation,
-                    fontFamily
-                  });
-                }
-              }}
-              min="0"
-              max="200"
-              step="1"
-            />
-          </div>
-          <div className="control-group">
-            <label htmlFor="textColor">Text Color</label>
-            <input
-              id="textColor"
-              type="color"
-              value={textColor}
-              onChange={(e) => {
-                setTextColor(e.target.value);
-                handleUpdate();
-              }}
-            />
-          </div>
-          <div className="control-group full-width">
-            <div className="rotation-label">
-              <label htmlFor="rotation">Rotation</label>
-              <span className="rotation-value">{rotation}°</span>
-            </div>
-            <input
-              id="rotation"
-              type="range"
-              value={rotation}
-              onChange={(e) => {
-                const newRotation = Number(e.target.value);
-                setRotation(newRotation);
+          <input
+            type="number"
+            value={fontSize}
+            onChange={(e) => {
+              const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
+              if (!isNaN(newSize)) {
+                setFontSize(newSize);
                 onUpdate(overlay.id, text, {
-                  fontSize,
+                  fontSize: newSize,
                   color: textColor,
-                  rotation: newRotation,
+                  rotation,
                   fontFamily
                 });
-              }}
-              min="-180"
-              max="180"
-              step="1"
-              className="rotation-slider"
-            />
-            <div className="rotation-markers">
-              <span>-180°</span>
-              <span>0°</span>
-              <span>180°</span>
-            </div>
-          </div>
+              }
+            }}
+            min="0"
+            max="200"
+            step="1"
+            placeholder="Font size"
+          />
+          <input
+            type="color"
+            value={textColor}
+            onChange={(e) => {
+              setTextColor(e.target.value);
+              handleUpdate();
+            }}
+            title="Text color"
+          />
+          <input
+            type="range"
+            value={rotation}
+            onChange={(e) => {
+              const newRotation = Number(e.target.value);
+              setRotation(newRotation);
+              onUpdate(overlay.id, text, {
+                fontSize,
+                color: textColor,
+                rotation: newRotation,
+                fontFamily
+              });
+            }}
+            min="-180"
+            max="180"
+            step="1"
+            title={`Rotation: ${rotation}°`}
+            className="rotation-slider"
+          />
         </div>
         <button className="close-editor-btn" onClick={onClose}>
           Done

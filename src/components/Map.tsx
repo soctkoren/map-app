@@ -328,13 +328,9 @@ const Map: React.FC = () => {
                   className={draggingId === overlay.id ? 'dragging' : ''}
                   style={{
                     transform: `rotate(${overlay.rotation}deg)`,
-                    transformOrigin: 'center',
-                    transformBox: 'fill-box',
                     cursor: 'move',
                     userSelect: 'none',
-                    fontFamily: overlay.fontFamily,
-                    textAnchor: 'middle',
-                    dominantBaseline: 'middle'
+                    fontFamily: overlay.fontFamily
                   }}
                   onMouseDown={(e) => handleMouseDown(e, overlay)}
                   onContextMenu={handleContextMenu}
