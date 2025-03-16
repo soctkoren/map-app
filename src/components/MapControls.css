@@ -579,6 +579,7 @@
   align-items: center;
   z-index: 2000;
   pointer-events: none;
+  overflow: hidden; /* Prevent scrolling */
 }
 
 .layer-editor-content {
@@ -589,16 +590,15 @@
   width: 420px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   right: 320px;
-  top: 50%;
   transform: translateY(-50%);
   pointer-events: auto;
   animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  max-height: calc(100vh - 80px);
+  max-height: min(calc(100vh - 40px), 600px); /* Cap height and ensure padding */
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-/* Add a pointer to the editor */
+/* Ensure the pointer arrow stays visible */
 .layer-editor-content::after {
   content: '';
   position: absolute;
@@ -609,6 +609,7 @@
   background: white;
   transform: translateY(-50%) rotate(45deg);
   box-shadow: 4px -4px 8px rgba(0, 0, 0, 0.05);
+  pointer-events: none; /* Prevent pointer from interfering with scrolling */
 }
 
 .layer-editor-content h4 {
@@ -629,6 +630,13 @@
   font-size: 14px;
   font-weight: 500;
   color: #4a5568;
+}
+
+.layer-editor-content .field-label .instruction-text {
+  font-weight: normal;
+  color: #718096;
+  font-size: 13px;
+  margin-left: 4px;
 }
 
 .layer-editor-content textarea,

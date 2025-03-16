@@ -116,7 +116,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
         
         {!overlay.isSvg && (
           <div className="field-group">
-            <label className="field-label">Text</label>
+            <label className="field-label">Text <span className="instruction-text">(Right-click drag to move text on map)</span></label>
             <input
               type="text"
               value={text}
@@ -314,7 +314,20 @@ const MapControls: React.FC<MapControlsProps> = ({
 
   const handleEditLayer = (id: string, event: React.MouseEvent<HTMLButtonElement>) => {
     const buttonRect = event.currentTarget.getBoundingClientRect();
-    setEditorPosition(buttonRect.top);
+    const editorHeight = 420; // Approximate height of the editor
+    const windowHeight = window.innerHeight;
+    const padding = 20; // Minimum padding from screen edges
+    
+    // Calculate the safe position that keeps the editor within screen bounds
+    let safePosition = Math.max(
+      padding + editorHeight/2, // Don't go above screen
+      Math.min(
+        buttonRect.top, // Desired position
+        windowHeight - padding - editorHeight/2 // Don't go below screen
+      )
+    );
+    
+    setEditorPosition(safePosition);
     setSelectedLayerId(id);
     setIsAddingNewText(false);
   };
