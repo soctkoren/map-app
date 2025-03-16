@@ -416,10 +416,10 @@ const Map: React.FC = () => {
               mapContainer.style.borderRadius = '0';
             }
 
-            // Hide controls
-            const controls = clonedViewport.querySelectorAll('.leaflet-control, .print-size-indicator');
-            controls.forEach((control) => {
-              (control as HTMLElement).style.display = 'none';
+            // Hide controls and tooltip
+            const elementsToHide = clonedViewport.querySelectorAll('.leaflet-control, .print-size-indicator, .map-info-tooltip');
+            elementsToHide.forEach((element) => {
+              (element as HTMLElement).style.display = 'none';
             });
 
             // Scale text overlays and preserve font properties
