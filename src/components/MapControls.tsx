@@ -136,7 +136,31 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
         )}
 
         <div className="style-controls">
-          {!overlay.isSvg && (
+          {overlay.isSvg ? (
+            <div className="size-control">
+              <label>
+                Size
+                <span>{fontSize}px</span>
+              </label>
+              <input
+                type="range"
+                className="size-slider"
+                min="16"
+                max="96"
+                value={fontSize}
+                onChange={(e) => {
+                  const newSize = parseInt(e.target.value);
+                  setFontSize(newSize);
+                  onUpdate(overlay.id, overlay.svgPath!, {
+                    fontSize: newSize,
+                    color: textColor,
+                    rotation,
+                    fontFamily
+                  });
+                }}
+              />
+            </div>
+          ) : (
             <>
               <div className="field-group">
                 <label className="field-label">Font Family</label>
@@ -185,8 +209,8 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
             </>
           )}
           
-          <div className="color-control">
-            <label>Color</label>
+          <div className="field-group">
+            <label className="field-label">Color</label>
             <input
               type="color"
               value={textColor}
