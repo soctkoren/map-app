@@ -60,11 +60,17 @@ const DEFAULT_TEXT: TextOverlay = {
 };
 
 const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, isNew = false, position }) => {
-  const [fontSize, setFontSize] = useState(overlay.fontSize);
-  const [textColor, setTextColor] = useState(overlay.color);
-  const [rotation, setRotation] = useState(overlay.rotation);
-  const [text, setText] = useState(overlay.text);
-  const [fontFamily, setFontFamily] = useState(overlay.fontFamily || 'Roboto');
+  // Add null checks with default values
+  const [fontSize, setFontSize] = useState(overlay?.fontSize ?? 100);
+  const [textColor, setTextColor] = useState(overlay?.color ?? '#000000');
+  const [rotation, setRotation] = useState(overlay?.rotation ?? 0);
+  const [text, setText] = useState(overlay?.text ?? '');
+  const [fontFamily, setFontFamily] = useState(overlay?.fontFamily ?? 'Roboto');
+
+  // Early return if overlay is undefined
+  if (!overlay) {
+    return null;
+  }
 
   // Function to snap rotation to common angles
   const snapRotation = (value: number): number => {
@@ -465,7 +471,7 @@ const MapControls: React.FC<MapControlsProps> = ({
         </button>
       </div>
 
-      {selectedLayerId && (
+      {selectedLayerId && textOverlays.find(o => o.id === selectedLayerId) && (
         <LayerEditor
           overlay={textOverlays.find(o => o.id === selectedLayerId)!}
           onUpdate={onUpdateText}
