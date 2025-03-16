@@ -300,6 +300,18 @@ const MapControls: React.FC<MapControlsProps> = ({
           isNew={isAddingNewText}
         />
       )}
+
+      <a
+        href="https://www.paypal.com/donate/?business=W7PELRRREYBSU&no_recurring=0&item_name=Takes+for+supporting+my+channel+via+this+donation%21&currency_code=USD"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="donate-button"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M2 21h18v-2H2v2M20 8h-2V5h2v3m0-5H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2m-4 10c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V5h10v8z"/>
+        </svg>
+        <span>Buy me a coffee</span>
+      </a>
     </div>
   );
 };

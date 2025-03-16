@@ -331,7 +331,7 @@ const Map: React.FC = () => {
     setIsCapturing(true);
 
     try {
-      // Wait for capturing class transition
+      // Wait for capturing class transition (which removes rounded corners)
       await new Promise(resolve => setTimeout(resolve, 300));
 
       // Pre-load all fonts before capture
@@ -345,11 +345,6 @@ const Map: React.FC = () => {
       const map = mapInstanceRef.current;
       const { pixelWidth, pixelHeight } = selectedPosterSize;
 
-      // Get the current map state
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-      const bounds = map.getBounds();
-
       // Calculate the scale factor
       const viewportRect = viewport.getBoundingClientRect();
       const scale = pixelWidth / viewportRect.width;
@@ -360,13 +355,24 @@ const Map: React.FC = () => {
         width: viewportRect.width,
         height: viewportRect.height,
         backgroundColor: null,
-        logging: true, // Enable logging for debugging
+        logging: true,
         useCORS: true,
         allowTaint: true,
         onclone: (clonedDoc) => {
-          // Hide UI elements in the cloned document
+          // Hide UI elements and remove rounded corners in the cloned document
           const clonedViewport = clonedDoc.querySelector('.print-viewport') as HTMLElement;
           if (clonedViewport) {
+            // Remove rounded corners from cloned viewport
+            clonedViewport.style.borderRadius = '0';
+            clonedViewport.style.overflow = 'hidden';
+
+            // Also remove rounded corners from the map container
+            const mapContainer = clonedViewport.querySelector('.leaflet-container') as HTMLElement;
+            if (mapContainer) {
+              mapContainer.style.borderRadius = '0';
+            }
+
+            // Hide controls
             const controls = clonedViewport.querySelectorAll('.leaflet-control, .print-size-indicator');
             controls.forEach((control) => {
               (control as HTMLElement).style.display = 'none';
@@ -421,6 +427,7 @@ const Map: React.FC = () => {
     } catch (error) {
       console.error('Error capturing map:', error);
     } finally {
+      // Restore rounded corners by removing capturing class
       setIsCapturing(false);
     }
   };
