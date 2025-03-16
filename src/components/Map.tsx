@@ -541,55 +541,63 @@ const Map: React.FC = () => {
           <MapContainer
             center={DEFAULT_CENTER}
             zoom={DEFAULT_ZOOM}
+            scrollWheelZoom={true}
             style={{ width: '100%', height: '100%' }}
           >
-            <MapOperations onMapReady={handleMapReady} />
             <TileLayer
-              attribution={selectedMapStyle.attribution}
               url={selectedMapStyle.url}
+              attribution={selectedMapStyle.attribution}
             />
-            <svg 
-              className="text-overlay-container" 
-              style={{ 
-                width: '100%', 
-                height: '100%', 
-                position: 'absolute', 
-                top: 0, 
-                left: 0, 
-                pointerEvents: 'none',
-                overflow: 'visible'
-              }}
-            >
-              {/* Render center guides */}
-              {renderCenterGuides()}
-              
-              {textOverlays.map((overlay) => (
-                <text
-                  key={overlay.id}
-                  x={overlay.x}
-                  y={overlay.y}
-                  fontSize={calculateScaledFontSize(overlay.fontSize)}
-                  fill={overlay.color}
-                  className={draggingId === overlay.id ? 'dragging' : ''}
-                  style={{
-                    transform: `rotate(${overlay.rotation}deg)`,
-                    transformBox: 'fill-box',
-                    transformOrigin: '50% 50%',
-                    cursor: 'move',
-                    userSelect: 'none',
-                    fontFamily: overlay.fontFamily,
-                    dominantBaseline: 'middle',
-                    textAnchor: 'middle',
-                    pointerEvents: 'auto'
-                  }}
-                  onMouseDown={(e) => handleMouseDown(e, overlay)}
-                  onContextMenu={handleContextMenu}
-                >
-                  {overlay.text}
-                </text>
-              ))}
-            </svg>
+            <MapOperations onMapReady={handleMapReady} />
           </MapContainer>
+
+          <div className="map-info-tooltip" role="tooltip" aria-label="How to use">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm2-1.645A3.502 3.502 0 0012 6.5a3.501 3.501 0 00-3.433 2.813l1.962.393A1.5 1.5 0 1112 11.5a1 1 0 00-1 1V14h2v-.645z" fill="currentColor"/>
+            </svg>
+          </div>
+
+          <svg 
+            className="text-overlay-container" 
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              pointerEvents: 'none',
+              overflow: 'visible'
+            }}
+          >
+            {/* Render center guides */}
+            {renderCenterGuides()}
+            
+            {textOverlays.map((overlay) => (
+              <text
+                key={overlay.id}
+                x={overlay.x}
+                y={overlay.y}
+                fontSize={calculateScaledFontSize(overlay.fontSize)}
+                fill={overlay.color}
+                className={draggingId === overlay.id ? 'dragging' : ''}
+                style={{
+                  transform: `rotate(${overlay.rotation}deg)`,
+                  transformBox: 'fill-box',
+                  transformOrigin: '50% 50%',
+                  cursor: 'move',
+                  userSelect: 'none',
+                  fontFamily: overlay.fontFamily,
+                  dominantBaseline: 'middle',
+                  textAnchor: 'middle',
+                  pointerEvents: 'auto'
+                }}
+                onMouseDown={(e) => handleMouseDown(e, overlay)}
+                onContextMenu={handleContextMenu}
+              >
+                {overlay.text}
+              </text>
+            ))}
+          </svg>
         </div>
       </div>
       <MapControls
