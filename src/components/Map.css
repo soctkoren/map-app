@@ -84,6 +84,8 @@
 
 .text-overlay-container text {
   pointer-events: auto;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 
 .text-overlay-container text.dragging {

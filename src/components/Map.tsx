@@ -573,10 +573,11 @@ const Map: React.FC = () => {
                   className={draggingId === overlay.id ? 'dragging' : ''}
                   style={{
                     transform: `rotate(${overlay.rotation}deg)`,
+                    transformBox: 'fill-box',
+                    transformOrigin: '50% 50%',
                     cursor: 'move',
                     userSelect: 'none',
                     fontFamily: overlay.fontFamily,
-                    transformOrigin: 'center',
                     dominantBaseline: 'middle',
                     textAnchor: 'middle',
                     pointerEvents: 'auto'
