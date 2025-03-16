@@ -3,32 +3,27 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "react-router build",
-    "dev": "react-router dev",
-    "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc",
-    "deploy": "gh-pages -d build",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist",
     "predeploy": "npm run build"
   },
   "dependencies": {
-    "@react-router/node": "^7.3.0",
-    "@react-router/serve": "^7.3.0",
     "@types/leaflet": "^1.9.16",
     "isbot": "^5.1.17",
     "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-leaflet": "^5.0.0",
-    "react-router": "^7.3.0"
+    "react-router-dom": "^6.22.0"
   },
   "devDependencies": {
-    "@react-router/dev": "^7.3.0",
-    "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^20",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
     "gh-pages": "^6.3.0",
-    "react-router-devtools": "^1.1.0",
+    "@vitejs/plugin-react": "^4.2.1",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2",
     "vite": "^5.4.11",
