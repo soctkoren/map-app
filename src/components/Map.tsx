@@ -153,6 +153,7 @@ interface MapControlsProps {
   onMapStyleChange: (style: MapStyle) => void;
   currentBackground: { url: string; credit: string; description: string };
   onBackgroundChange: (background: { url: string; credit: string; description: string }) => void;
+  onLocationChange: (lat: number, lng: number) => void;
 }
 
 const Map: React.FC = () => {
@@ -517,6 +518,12 @@ const Map: React.FC = () => {
   // Update the background image with proper query parameters
   const backgroundUrl = `${currentBackground.url}?auto=format&fit=crop&w=2000&q=80`;
 
+  const handleLocationChange = (lat: number, lng: number) => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView([lat, lng], 13);
+    }
+  };
+
   return (
     <div className="map-page">
       <div 
@@ -595,6 +602,7 @@ const Map: React.FC = () => {
         mapStyles={MAP_STYLES}
         selectedMapStyle={selectedMapStyle}
         onMapStyleChange={handleMapStyleChange}
+        onLocationChange={handleLocationChange}
       />
     </div>
   );

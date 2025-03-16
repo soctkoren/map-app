@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { PosterSize, TextOverlay, TextStyle, MapStyle } from '../types';
 import './MapControls.css';
 import { backgrounds } from './BackgroundGallery';
@@ -14,6 +14,13 @@ interface MapControlsProps {
   mapStyles: MapStyle[];
   selectedMapStyle: MapStyle;
   onMapStyleChange: (style: MapStyle) => void;
+  onLocationChange: (lat: number, lng: number) => void;
+}
+
+interface SearchResult {
+  display_name: string;
+  lat: string;
+  lon: string;
 }
 
 const POSTER_SIZES: PosterSize[] = [
@@ -172,11 +179,53 @@ const MapControls: React.FC<MapControlsProps> = ({
   onCapture,
   mapStyles,
   selectedMapStyle,
-  onMapStyleChange
+  onMapStyleChange,
+  onLocationChange
 }) => {
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [isAddingNewText, setIsAddingNewText] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Don't search if query is too short
+    if (query.length < 3) {
+      setSearchResults([]);
+      return;
+    }
+
+    // Add debounce to prevent too many requests
+    searchTimeoutRef.current = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`
+        );
+        const data = await response.json();
+        setSearchResults(data);
+      } catch (error) {
+        console.error('Error searching for location:', error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+  };
+
+  const handleLocationSelect = (result: SearchResult) => {
+    setSearchQuery(result.display_name);
+    setSearchResults([]);
+    onLocationChange(parseFloat(result.lat), parseFloat(result.lon));
+  };
 
   const handleStartAddText = () => {
     const id = Date.now().toString();
@@ -198,6 +247,37 @@ const MapControls: React.FC<MapControlsProps> = ({
 
   return (
     <div className="map-controls">
+      <div className="control-section">
+        <h3>Search Location</h3>
+        <div className="search-container">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.target.value)}
+            placeholder="Search for a location..."
+            className="search-input"
+          />
+          {isSearching && (
+            <div className="search-loading">
+              <span>Searching...</span>
+            </div>
+          )}
+          {searchResults.length > 0 && (
+            <div className="search-results">
+              {searchResults.map((result, index) => (
+                <button
+                  key={index}
+                  className="search-result-item"
+                  onClick={() => handleLocationSelect(result)}
+                >
+                  {result.display_name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="control-section">
         <h3>Map Style</h3>
         <div className="style-selector">
