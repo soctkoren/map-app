@@ -30,6 +30,14 @@ interface LayerEditorProps {
   isNew?: boolean;
 }
 
+const AVAILABLE_FONTS = [
+  { name: 'ABeeZee', value: 'ABeeZee' },
+  { name: 'Roboto', value: 'Roboto' },
+  { name: 'Arial', value: 'Arial' },
+  { name: 'Times New Roman', value: 'Times New Roman' },
+  { name: 'Helvetica', value: 'Helvetica' }
+];
+
 const DEFAULT_TEXT: TextOverlay = {
   id: '',
   text: 'New Text',
@@ -37,7 +45,8 @@ const DEFAULT_TEXT: TextOverlay = {
   y: 0,
   fontSize: 100,
   color: '#000000',
-  rotation: 0
+  rotation: 0,
+  fontFamily: 'ABeeZee'
 };
 
 const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, isNew = false }) => {
@@ -45,12 +54,14 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
   const [textColor, setTextColor] = useState(overlay.color);
   const [rotation, setRotation] = useState(overlay.rotation);
   const [text, setText] = useState(overlay.text);
+  const [fontFamily, setFontFamily] = useState(overlay.fontFamily || 'ABeeZee');
 
   const handleUpdate = () => {
     onUpdate(overlay.id, text, {
       fontSize,
       color: textColor,
-      rotation
+      rotation,
+      fontFamily
     });
   };
 
@@ -66,13 +77,33 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
             onUpdate(overlay.id, e.target.value, {
               fontSize,
               color: textColor,
-              rotation
+              rotation,
+              fontFamily
             });
           }}
           placeholder="Enter text..."
           autoFocus
         />
         <div className="style-controls">
+          <select
+            value={fontFamily}
+            onChange={(e) => {
+              setFontFamily(e.target.value);
+              onUpdate(overlay.id, text, {
+                fontSize,
+                color: textColor,
+                rotation,
+                fontFamily: e.target.value
+              });
+            }}
+            className="font-select"
+          >
+            {AVAILABLE_FONTS.map(font => (
+              <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                {font.name}
+              </option>
+            ))}
+          </select>
           <input
             type="number"
             value={fontSize}
@@ -83,18 +114,8 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
                 onUpdate(overlay.id, text, {
                   fontSize: newSize,
                   color: textColor,
-                  rotation
-                });
-              }
-            }}
-            onBlur={(e) => {
-              const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
-              if (!isNaN(newSize)) {
-                setFontSize(newSize);
-                onUpdate(overlay.id, text, {
-                  fontSize: newSize,
-                  color: textColor,
-                  rotation
+                  rotation,
+                  fontFamily
                 });
               }
             }}

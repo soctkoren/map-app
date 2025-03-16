@@ -10,6 +10,7 @@ export interface TextStyle {
   fontSize: number;
   color: string;
   rotation: number;
+  fontFamily: string;
 }
 
 export interface TextOverlay {
@@ -20,6 +21,7 @@ export interface TextOverlay {
   fontSize: number;
   color: string;
   rotation: number;
+  fontFamily: string;
 }
 
 export interface MapStyle {

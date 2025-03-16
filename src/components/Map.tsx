@@ -152,7 +152,8 @@ const Map: React.FC = () => {
       y: rect.height * 0.8, // Position at 80% of height (20% from bottom)
       fontSize: style.fontSize,
       color: style.color,
-      rotation: style.rotation
+      rotation: style.rotation,
+      fontFamily: style.fontFamily
     };
 
     setTextOverlays([...textOverlays, newText]);
@@ -167,7 +168,8 @@ const Map: React.FC = () => {
               text,
               fontSize: style.fontSize,
               color: style.color,
-              rotation: style.rotation
+              rotation: style.rotation,
+              fontFamily: style.fontFamily
             }
           : overlay
       )
@@ -327,7 +329,8 @@ const Map: React.FC = () => {
                   style={{
                     transform: `rotate(${overlay.rotation}deg)`,
                     cursor: 'move',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    fontFamily: overlay.fontFamily
                   }}
                   onMouseDown={(e) => handleMouseDown(e, overlay)}
                   onContextMenu={handleContextMenu}
