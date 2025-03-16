@@ -1,0 +1,225 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 
+           focus:ring-primary-500;
+  }
+  
+  .btn-success {
+    @apply btn bg-success-500 text-white hover:bg-success-600 
+           focus:ring-success-500;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 rounded-lg border border-gray-300 
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           bg-white/80 backdrop-blur-sm transition-all duration-200;
+  }
+  
+  .select {
+    @apply input appearance-none bg-no-repeat bg-right pr-10;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-size: 1.5em 1.5em;
+  }
+  
+  .card {
+    @apply bg-white/80 backdrop-blur-sm rounded-xl border border-gray-200/50 
+           shadow-soft transition-all duration-200;
+  }
+  
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300/50 rounded-full hover:bg-gray-400/50 transition-colors;
+}
+
+/* Leaflet overrides */
+.leaflet-container {
+  @apply rounded-xl overflow-hidden shadow-soft;
+}
+
+.leaflet-control {
+  @apply !shadow-soft !rounded-lg !border !border-gray-200/50;
+}
+
+.leaflet-bar a {
+  @apply !bg-white/90 !backdrop-blur-sm !border-gray-200/50 
+         hover:!bg-gray-50/90 transition-colors;
+}
+
+.leaflet-control-attribution {
+  @apply !bg-white/80 !backdrop-blur-sm !text-xs !text-gray-500;
+}
+
+/* Print viewport */
+.print-viewport {
+  @apply relative rounded-xl overflow-hidden shadow-soft transition-all;
+}
+
+.print-viewport.capturing {
+  @apply shadow-none rounded-none;
+}
+
+/* Text overlay container */
+.text-overlay-container {
+  @apply absolute inset-0 pointer-events-none z-[1000];
+}
+
+.text-overlay-container text {
+  @apply pointer-events-auto transition-opacity;
+}
+
+.text-overlay-container text.dragging {
+  @apply opacity-70;
+}
+
+/* Size indicator */
+.print-size-indicator {
+  @apply absolute bottom-3 left-1/2 -translate-x-1/2 
+         bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg 
+         text-sm text-gray-700 shadow-soft z-[1000]
+         transition-opacity;
+}
+
+.capturing .print-size-indicator {
+  @apply opacity-0;
+}
+
+/* Controls */
+.map-controls {
+  @apply w-[300px] h-screen bg-white/95 backdrop-blur-md 
+         border-l border-gray-200/50 p-5 overflow-y-auto;
+}
+
+.control-section {
+  @apply mb-6 last:mb-0;
+}
+
+.control-section h3 {
+  @apply text-lg font-semibold text-gray-900 mb-3;
+}
+
+/* Text controls */
+.text-controls-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.add-text-btn {
+  @apply btn-primary;
+}
+
+.text-layers {
+  @apply space-y-2;
+}
+
+.text-layer {
+  @apply flex items-center justify-between p-3 rounded-lg 
+         bg-white/80 backdrop-blur-sm border border-gray-200/50
+         cursor-pointer transition-all hover:bg-white;
+}
+
+.text-layer.selected {
+  @apply bg-primary-50/80 border-primary-500;
+}
+
+.layer-text {
+  @apply flex-1 truncate mr-2 text-gray-700;
+}
+
+.delete-layer-btn {
+  @apply p-1.5 text-gray-400 hover:text-red-500 rounded-full
+         transition-colors hover:bg-red-50;
+}
+
+/* Layer editor */
+.layer-editor-popup {
+  @apply fixed inset-0 bg-black/20 backdrop-blur-sm
+         flex items-center justify-center z-[2000];
+}
+
+.layer-editor-content {
+  @apply bg-white/95 backdrop-blur-md rounded-2xl p-6
+         w-[90%] max-w-md shadow-xl border border-white/20
+         transform -translate-x-[150px] animate-slide-up;
+}
+
+/* Style controls */
+.style-controls {
+  @apply grid grid-cols-2 gap-3;
+}
+
+/* Font selector */
+.font-select {
+  @apply select;
+}
+
+/* Color picker */
+input[type="color"] {
+  @apply h-10 rounded-lg border border-gray-300 bg-white/80 
+         cursor-pointer transition-all hover:border-gray-400;
+}
+
+/* Rotation slider */
+.rotation-slider {
+  @apply w-full h-2 bg-gray-200 rounded-full appearance-none 
+         cursor-pointer col-span-2 my-4;
+}
+
+.rotation-slider::-webkit-slider-thumb {
+  @apply appearance-none w-5 h-5 bg-white rounded-full 
+         border-2 border-primary-500 cursor-pointer
+         transition-all hover:scale-110 active:scale-105
+         shadow-md;
+}
+
+/* Print settings */
+.current-size-info {
+  @apply card p-4 space-y-1;
+}
+
+.size-name {
+  @apply text-base font-medium text-gray-900;
+}
+
+.size-dimensions {
+  @apply text-sm text-gray-600;
+}
+
+.size-pixels {
+  @apply text-xs text-gray-500;
+}
+
+/* Capture button */
+.capture-btn {
+  @apply btn-success w-full mt-4;
+} 

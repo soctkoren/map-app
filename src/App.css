@@ -8,4 +8,52 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+}
+
+@layer components {
+  .app-container {
+    @apply min-h-screen bg-gradient-to-br from-gray-50 to-gray-100;
+  }
+
+  .map-page {
+    @apply flex min-h-screen bg-gray-50;
+  }
+
+  .map-container {
+    @apply flex-1 relative bg-gray-100;
+  }
+
+  .map-wrapper {
+    @apply h-full w-full p-6;
+  }
+
+  /* Modern donate button */
+  .donate-button {
+    @apply fixed bottom-6 right-6 flex items-center gap-2 px-4 py-3
+           bg-gradient-to-r from-primary-500 to-primary-600
+           text-white font-medium rounded-xl shadow-lg
+           transform transition-all duration-300 hover:scale-105
+           hover:shadow-xl focus:outline-none focus:ring-2
+           focus:ring-primary-500 focus:ring-offset-2 z-50;
+  }
+
+  .donate-button svg {
+    @apply w-5 h-5 text-white;
+  }
+
+  .donate-button.capturing {
+    @apply opacity-0 pointer-events-none;
+  }
+
+  /* Modern size indicator */
+  .size-indicator {
+    @apply fixed bottom-6 left-1/2 -translate-x-1/2
+           bg-white/90 backdrop-blur-sm px-4 py-2
+           rounded-lg shadow-soft text-sm text-gray-700
+           transform transition-all duration-300 z-50;
+  }
+
+  .size-indicator.capturing {
+    @apply opacity-0;
+  }
 } 
