@@ -943,7 +943,7 @@
   position: fixed;
   left: 24px;
   top: 50%;
-  transform: translateY(calc(25vh - 50%));
+  transform: translateY(-50%);
   width: 80px;
   display: flex;
   flex-direction: column;
@@ -960,7 +960,21 @@
 .social-buttons.hidden {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(calc(25vh - 50%)) translateY(10px);
+  transform: translateY(-50%) translateY(10px);
+}
+
+/* Remove any conflicting styles */
+.social-buttons, 
+.social-buttons.hidden,
+.profile-link,
+.donate-button,
+.youtube-button {
+  display: flex;
+}
+
+.profile-link {
+  display: block;
+  transition: transform 0.2s ease;
 }
 
 .profile-image {
@@ -1021,8 +1035,8 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
 }
 
 .search-loading {
@@ -1038,16 +1052,19 @@
   animation: spin 0.8s linear infinite;
   pointer-events: none;
   background: transparent;
+  margin: 0;
+  padding: 0;
 }
 
 .search-input {
   width: 100%;
-  padding: 8px 12px;
-  padding-right: 40px; /* Reduced padding since spinner is smaller than text */
+  padding: 12px;
+  padding-right: 40px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
   background: white;
+  line-height: 1.5;
 }
 
 .search-result-item {
@@ -1179,4 +1196,9 @@
 
 .map-pin-button.selected svg {
   color: #0066FF;
+}
+
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
 } 

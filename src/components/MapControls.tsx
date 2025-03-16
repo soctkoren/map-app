@@ -337,7 +337,7 @@ const MapControls: React.FC<MapControlsProps> = ({
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
             />
-            {isSearching && <div className="search-loading">Searching...</div>}
+            {isSearching && <div className="search-loading" />}
             {searchResults.length > 0 && (
               <div className="search-results">
                 {searchResults.map((result, index) => (

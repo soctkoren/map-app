@@ -1,22 +1,114 @@
 .map-page {
   display: flex;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  position: relative;
+  background: #f8fafc;
 }
 
 .map-container {
   flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height: 100vh;
   position: relative;
-  padding: 20px;
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.3)),
-    url('https://images.unsplash.com/photo-1504851149312-7a075b496cc7?auto=format&fit=crop&w=2000&q=80');
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
+}
+
+.social-buttons {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 900;
+}
+
+.social-buttons.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) translateY(10px);
+}
+
+/* Remove any conflicting styles */
+.social-buttons, 
+.social-buttons.hidden,
+.profile-link,
+.donate-button,
+.youtube-button {
+  display: flex;
+}
+
+.profile-link {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.profile-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.profile-image:hover {
+  transform: scale(1.05);
+}
+
+.donate-button,
+.youtube-button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.donate-button svg,
+.youtube-button svg {
+  width: 24px;
+  height: 24px;
+  color: #4a5568;
+}
+
+.donate-button:hover,
+.youtube-button:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.donate-button:hover svg {
+  color: #0066FF;
+}
+
+.youtube-button:hover svg {
+  color: #FF0000;
+}
+
+/* Hide the text, show only icons */
+.donate-button span,
+.youtube-button span {
+  display: none;
 }
 
 /* Add a subtle animation to the background */
@@ -243,48 +335,6 @@ div[style*="height: 100vh"] {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.donate-button {
-  width: calc(100% - 40px);
-  margin: 20px;
-  background-color: #0079C1;
-  color: white;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
-  text-decoration: none;
-}
-
-.donate-button:hover {
-  background-color: #005EA6;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.donate-button svg {
-  width: 18px;
-  height: 18px;
-  fill: white;
-  flex-shrink: 0;
-}
-
-.donate-button span {
-  font-size: 15px;
-}
-
-.donate-button.capturing {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .help-tooltip {
