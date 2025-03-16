@@ -10,6 +10,10 @@ import MapControls from './MapControls';
 const DEFAULT_CENTER: L.LatLngTuple = [51.505, -0.09];
 const DEFAULT_ZOOM = 13;
 
+// Add constants for center snapping
+const SNAP_THRESHOLD = 20; // Pixels from center to trigger snapping
+const CENTER_GUIDE_COLOR = 'rgba(0, 120, 255, 0.6)'; // Semi-transparent blue
+
 // Function to load Google Font
 const loadGoogleFont = async (fontFamily: string) => {
   try {
@@ -139,6 +143,7 @@ const Map: React.FC = () => {
     textX: 0,
     textY: 0
   });
+  const [showCenterGuides, setShowCenterGuides] = useState<{x: boolean, y: boolean}>({ x: false, y: false });
 
   useEffect(() => {
     const updateViewportSize = () => {
@@ -232,6 +237,16 @@ const Map: React.FC = () => {
     setSelectedMapStyle(style);
   };
 
+  // Function to check if a position is near the center
+  const isNearCenter = (pos: number, center: number): boolean => {
+    return Math.abs(pos - center) < SNAP_THRESHOLD;
+  };
+
+  // Function to get snapped position
+  const getSnappedPosition = (pos: number, center: number): number => {
+    return isNearCenter(pos, center) ? center : pos;
+  };
+
   const handleMouseDown = (e: React.MouseEvent, overlay: TextOverlay) => {
     e.preventDefault();
     const target = e.currentTarget as SVGTextElement;
@@ -253,18 +268,41 @@ const Map: React.FC = () => {
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!dragStateRef.current.isDragging) return;
+    if (!dragStateRef.current.isDragging || !printViewportRef.current) return;
+
+    const viewport = printViewportRef.current;
+    const rect = viewport.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
 
     const dx = e.clientX - dragStateRef.current.startX;
     const dy = e.clientY - dragStateRef.current.startY;
+
+    // Calculate new positions
+    let newX = dragStateRef.current.textX + dx;
+    let newY = dragStateRef.current.textY + dy;
+
+    // Check if near center lines and snap if needed
+    const nearCenterX = isNearCenter(newX, centerX);
+    const nearCenterY = isNearCenter(newY, centerY);
+
+    // Update guide visibility
+    setShowCenterGuides({
+      x: nearCenterX,
+      y: nearCenterY
+    });
+
+    // Snap to center if near
+    if (nearCenterX) newX = centerX;
+    if (nearCenterY) newY = centerY;
 
     setTextOverlays(overlays =>
       overlays.map(overlay =>
         overlay.id === dragStateRef.current.textId
           ? {
               ...overlay,
-              x: dragStateRef.current.textX + dx,
-              y: dragStateRef.current.textY + dy
+              x: newX,
+              y: newY
             }
           : overlay
       )
@@ -274,6 +312,7 @@ const Map: React.FC = () => {
   const handleMouseUp = () => {
     dragStateRef.current.isDragging = false;
     setDraggingId(null);
+    setShowCenterGuides({ x: false, y: false });
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
   };
@@ -386,6 +425,45 @@ const Map: React.FC = () => {
     }
   };
 
+  // Function to render center guides
+  const renderCenterGuides = () => {
+    if (!printViewportRef.current) return null;
+    const viewport = printViewportRef.current;
+    const width = viewport.clientWidth;
+    const height = viewport.clientHeight;
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    return (
+      <>
+        {/* Vertical center guide */}
+        {showCenterGuides.x && (
+          <line
+            x1={centerX}
+            y1={0}
+            x2={centerX}
+            y2={height}
+            stroke={CENTER_GUIDE_COLOR}
+            strokeWidth="1"
+            strokeDasharray="5,5"
+          />
+        )}
+        {/* Horizontal center guide */}
+        {showCenterGuides.y && (
+          <line
+            x1={0}
+            y1={centerY}
+            x2={width}
+            y2={centerY}
+            stroke={CENTER_GUIDE_COLOR}
+            strokeWidth="1"
+            strokeDasharray="5,5"
+          />
+        )}
+      </>
+    );
+  };
+
   return (
     <div className="map-page">
       <div className="map-container">
@@ -416,6 +494,9 @@ const Map: React.FC = () => {
                 overflow: 'visible'
               }}
             >
+              {/* Render center guides */}
+              {renderCenterGuides()}
+              
               {textOverlays.map((overlay) => (
                 <text
                   key={overlay.id}
