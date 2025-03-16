@@ -104,46 +104,71 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
               </option>
             ))}
           </select>
-          <input
-            type="number"
-            value={fontSize}
-            onChange={(e) => {
-              const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
-              if (!isNaN(newSize)) {
-                setFontSize(newSize);
+          <div className="control-group">
+            <label htmlFor="fontSize">Font Size</label>
+            <input
+              id="fontSize"
+              type="number"
+              value={fontSize}
+              onChange={(e) => {
+                const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
+                if (!isNaN(newSize)) {
+                  setFontSize(newSize);
+                  onUpdate(overlay.id, text, {
+                    fontSize: newSize,
+                    color: textColor,
+                    rotation,
+                    fontFamily
+                  });
+                }
+              }}
+              min="0"
+              max="200"
+              step="1"
+            />
+          </div>
+          <div className="control-group">
+            <label htmlFor="textColor">Text Color</label>
+            <input
+              id="textColor"
+              type="color"
+              value={textColor}
+              onChange={(e) => {
+                setTextColor(e.target.value);
+                handleUpdate();
+              }}
+            />
+          </div>
+          <div className="control-group full-width">
+            <div className="rotation-label">
+              <label htmlFor="rotation">Rotation</label>
+              <span className="rotation-value">{rotation}°</span>
+            </div>
+            <input
+              id="rotation"
+              type="range"
+              value={rotation}
+              onChange={(e) => {
+                const newRotation = Number(e.target.value);
+                setRotation(newRotation);
                 onUpdate(overlay.id, text, {
-                  fontSize: newSize,
+                  fontSize,
                   color: textColor,
-                  rotation,
+                  rotation: newRotation,
                   fontFamily
                 });
-              }
-            }}
-            min="0"
-            max="200"
-            step="1"
-            placeholder="Font size"
-          />
-          <input
-            type="color"
-            value={textColor}
-            onChange={(e) => {
-              setTextColor(e.target.value);
-              handleUpdate();
-            }}
-            title="Text color"
-          />
-          <input
-            type="range"
-            value={rotation}
-            onChange={(e) => {
-              setRotation(Number(e.target.value));
-              handleUpdate();
-            }}
-            min="-180"
-            max="180"
-            title="Rotation"
-          />
+              }}
+              min="-180"
+              max="180"
+              step="1"
+              className="rotation-slider"
+            />
+            <div className="rotation-markers">
+              <span>-180°</span>
+              <span>0°</span>
+              <span>180°</span>
+            </div>
+          </div>
         </div>
         <button className="close-editor-btn" onClick={onClose}>
           Done
@@ -175,7 +200,8 @@ const MapControls: React.FC<MapControlsProps> = ({
     onAddText(newText.text, {
       fontSize: newText.fontSize,
       color: newText.color,
-      rotation: newText.rotation
+      rotation: newText.rotation,
+      fontFamily: newText.fontFamily
     });
     setSelectedLayerId(id);
     setIsAddingNewText(true);
