@@ -311,21 +311,17 @@ const MapControls: React.FC<MapControlsProps> = ({
         </div>
       </div>
 
-      <div className="control-section">
+      <div className="search-section">
         <h3>Search Location</h3>
         <div className="search-container">
           <input
             type="text"
+            className="search-input"
+            placeholder="Search Location"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search for a location..."
-            className="search-input"
           />
-          {isSearching && (
-            <div className="search-loading">
-              <span>Searching...</span>
-            </div>
-          )}
+          {isSearching && <div className="search-loading">Searching...</div>}
           {searchResults.length > 0 && (
             <div className="search-results">
               {searchResults.map((result, index) => (
