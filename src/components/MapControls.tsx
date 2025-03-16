@@ -124,26 +124,48 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
 
         <div className="style-controls">
           {!overlay.isSvg && (
-            <>
-              <select
-                value={fontFamily}
+            <select
+              value={fontFamily}
+              onChange={(e) => {
+                setFontFamily(e.target.value);
+                onUpdate(overlay.id, text, {
+                  fontSize,
+                  color: textColor,
+                  rotation,
+                  fontFamily: e.target.value
+                });
+              }}
+              className="font-select"
+            >
+              {AVAILABLE_FONTS.map(font => (
+                <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                  {font.name}
+                </option>
+              ))}
+            </select>
+          )}
+
+          <div className="size-control">
+            <label>{overlay.isSvg ? 'Icon Size' : 'Font Size'}</label>
+            <div className="size-slider-container">
+              <input
+                type="range"
+                value={fontSize}
                 onChange={(e) => {
-                  setFontFamily(e.target.value);
-                  onUpdate(overlay.id, text, {
-                    fontSize,
+                  const newSize = parseInt(e.target.value);
+                  setFontSize(newSize);
+                  onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
+                    fontSize: newSize,
                     color: textColor,
                     rotation,
-                    fontFamily: e.target.value
+                    fontFamily
                   });
                 }}
-                className="font-select"
-              >
-                {AVAILABLE_FONTS.map(font => (
-                  <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
-                    {font.name}
-                  </option>
-                ))}
-              </select>
+                min={overlay.isSvg ? 24 : 12}
+                max={overlay.isSvg ? 96 : 200}
+                step="1"
+                className="size-slider"
+              />
               <input
                 type="number"
                 value={fontSize}
@@ -151,7 +173,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
                   const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
                   if (!isNaN(newSize)) {
                     setFontSize(newSize);
-                    onUpdate(overlay.id, text, {
+                    onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
                       fontSize: newSize,
                       color: textColor,
                       rotation,
@@ -159,13 +181,13 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
                     });
                   }
                 }}
-                min="0"
-                max="200"
+                min={overlay.isSvg ? 24 : 12}
+                max={overlay.isSvg ? 96 : 200}
                 step="1"
-                placeholder="Font size"
+                className="size-input"
               />
-            </>
-          )}
+            </div>
+          </div>
           
           <div className="color-control">
             <label>Color</label>
