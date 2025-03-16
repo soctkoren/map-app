@@ -14,8 +14,6 @@ interface MapControlsProps {
   mapStyles: MapStyle[];
   selectedMapStyle: MapStyle;
   onMapStyleChange: (style: MapStyle) => void;
-  currentBackground: { url: string; credit: string; description: string };
-  onBackgroundChange: (background: { url: string; credit: string; description: string }) => void;
 }
 
 const POSTER_SIZES: PosterSize[] = [
@@ -174,9 +172,7 @@ const MapControls: React.FC<MapControlsProps> = ({
   onCapture,
   mapStyles,
   selectedMapStyle,
-  onMapStyleChange,
-  currentBackground,
-  onBackgroundChange
+  onMapStyleChange
 }) => {
   const [showSizeSelector, setShowSizeSelector] = useState(false);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
@@ -296,37 +292,6 @@ const MapControls: React.FC<MapControlsProps> = ({
         </button>
       </div>
 
-      <div className="control-section">
-        <h3>Background</h3>
-        <div className="background-gallery">
-          {backgrounds.map((bg: { url: string; credit: string; description: string }) => (
-            <button
-              key={bg.url}
-              onClick={() => onBackgroundChange(bg)}
-              className={`w-12 h-12 rounded-lg overflow-hidden transition-all ${
-                currentBackground.url === bg.url ? 'ring-2 ring-blue-500 scale-110' : 'opacity-50 hover:opacity-100'
-              }`}
-              title={`${bg.description} by ${bg.credit}`}
-            >
-              <img
-                src={`${bg.url}?auto=format&fit=crop&w=100&q=60`}
-                alt={bg.description}
-                className="w-full h-full object-cover"
-              />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {selectedLayerId && (
-        <LayerEditor
-          overlay={textOverlays.find(o => o.id === selectedLayerId)!}
-          onUpdate={onUpdateText}
-          onClose={handleCloseEditor}
-          isNew={isAddingNewText}
-        />
-      )}
-
       <a
         href="https://www.paypal.com/donate/?business=W7PELRRREYBSU&no_recurring=0&item_name=Takes+for+supporting+my+channel+via+this+donation%21&currency_code=USD"
         target="_blank"
@@ -338,6 +303,15 @@ const MapControls: React.FC<MapControlsProps> = ({
         </svg>
         <span>Buy me a coffee</span>
       </a>
+
+      {selectedLayerId && (
+        <LayerEditor
+          overlay={textOverlays.find(o => o.id === selectedLayerId)!}
+          onUpdate={onUpdateText}
+          onClose={handleCloseEditor}
+          isNew={isAddingNewText}
+        />
+      )}
     </div>
   );
 };

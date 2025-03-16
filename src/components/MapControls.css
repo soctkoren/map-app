@@ -547,49 +547,13 @@
   transform: scale(1.2);
 }
 
-.background-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 16px;
-  background: #f7fafc;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.background-gallery button {
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border: 2px solid transparent;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.background-gallery button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.background-gallery button.selected {
-  border-color: #4299e1;
-  transform: scale(1.05);
-  box-shadow: 0 4px 6px rgba(66, 153, 225, 0.2);
-}
-
-.background-gallery img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
+.background-gallery,
+.background-gallery button,
+.background-gallery button:hover,
+.background-gallery button.selected,
+.background-gallery img,
 .backgrounds-section {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid #edf2f7;
+  display: none;
 }
 
 .donate-button {

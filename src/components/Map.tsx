@@ -14,6 +14,46 @@ const DEFAULT_ZOOM = 13;
 const SNAP_THRESHOLD = 20; // Pixels from center to trigger snapping
 const CENTER_GUIDE_COLOR = 'rgba(0, 120, 255, 0.6)'; // Semi-transparent blue
 
+// Collection of beautiful nature backgrounds from Unsplash
+const NATURE_BACKGROUNDS = [
+  {
+    url: 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7',
+    credit: 'Nathan Anderson',
+    description: 'Mountain camping at night'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b',
+    credit: 'Kalen Emsley',
+    description: 'Mountain peaks and clouds'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba',
+    credit: 'Benjamin Voros',
+    description: 'Starry night over mountains'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1511497584788-876760111969',
+    credit: 'Fabian Quintero',
+    description: 'Northern lights over mountains'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1682686580391-615b1f28e5ee',
+    credit: 'Marek Piwnicki',
+    description: 'Misty mountain valley'
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1682686580186-b55d0f3d8e6d',
+    credit: 'Jonatan Pie',
+    description: 'Aurora over mountains'
+  }
+];
+
+// Function to get a random background
+const getRandomBackground = () => {
+  const randomIndex = Math.floor(Math.random() * NATURE_BACKGROUNDS.length);
+  return NATURE_BACKGROUNDS[randomIndex];
+};
+
 // Function to load Google Font
 const loadGoogleFont = async (fontFamily: string) => {
   try {
@@ -127,11 +167,7 @@ const Map: React.FC = () => {
   const [selectedMapStyle, setSelectedMapStyle] = useState<MapStyle>(
     MAP_STYLES.find(style => style.name === 'Positron') || MAP_STYLES[0]
   );
-  const [currentBackground, setCurrentBackground] = useState({
-    url: 'https://images.unsplash.com/photo-1504851149312-7a075b496cc7',
-    credit: 'Nathan Anderson',
-    description: 'Mountain camping at night'
-  });
+  const [currentBackground] = useState(getRandomBackground());
   const [viewportStyle, setViewportStyle] = useState({
     width: '100%',
     height: '100%',
@@ -559,8 +595,6 @@ const Map: React.FC = () => {
         mapStyles={MAP_STYLES}
         selectedMapStyle={selectedMapStyle}
         onMapStyleChange={handleMapStyleChange}
-        currentBackground={currentBackground}
-        onBackgroundChange={setCurrentBackground}
       />
     </div>
   );
