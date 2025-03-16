@@ -1,87 +1,121 @@
-# Welcome to React Router!
+# Momenti Maps
 
-A modern, production-ready template for building full-stack React applications using React Router.
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+Create beautiful map prints with customizable text and icons. This interactive web application allows you to design custom map prints with various styles, text overlays, and icons.
 
 ## Features
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- 🗺️ Interactive map with multiple style options
+- 📝 Add and customize text overlays
+- 🎨 Add and customize icons
+- 📏 Multiple print size options
+- 🖼️ Beautiful background options
+- 📱 Responsive design
+- 🔄 Real-time preview
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm (comes with Node.js)
+- Git
+
 ### Installation
 
-Install the dependencies:
+1. Clone the repository:
+```bash
+git clone https://github.com/soctkoren/map-app.git
+cd map-app
+```
 
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-### Development
-
-Start the development server with HMR:
-
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+The application will be available at `http://localhost:5173`
 
-## Building for Production
+## Deployment to GitHub Pages
 
-Create a production build:
+The application is configured to deploy to GitHub Pages. Follow these steps to deploy:
 
+1. Make sure your GitHub repository is set up:
+   - The repository should be named `map-app`
+   - Your GitHub username should match the one in package.json's homepage URL
+   - The repository should be public
+
+2. Configure GitHub Pages:
+   - Go to your repository settings
+   - Navigate to "Pages" in the sidebar
+   - Under "Source", select "Deploy from a branch"
+   - Select the "gh-pages" branch and "/(root)" folder
+   - Click "Save"
+
+3. Deploy the application:
 ```bash
-npm run build
+npm run deploy
 ```
 
-## Deployment
+This will:
+- Build your application
+- Create/update the gh-pages branch
+- Push the built files to GitHub
+- Deploy to GitHub Pages
 
-### Docker Deployment
+Your application will be available at: `https://[your-github-username].github.io/map-app`
 
-To build and run using Docker:
+### Troubleshooting Deployment
 
-```bash
-docker build -t my-app .
+If you encounter issues:
 
-# Run the container
-docker run -p 3000:3000 my-app
+1. Check that your repository name matches the homepage URL in package.json
+2. Ensure you have proper write permissions to the repository
+3. Clear your browser cache after deployment
+4. Wait a few minutes for GitHub Pages to update
+
+## Development
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build locally
+- `npm run deploy` - Deploy to GitHub Pages
+
+### Project Structure
+
+```
+map-app/
+├── src/
+│   ├── components/     # React components
+│   ├── types/         # TypeScript type definitions
+│   ├── App.tsx        # Main application component
+│   └── main.tsx       # Application entry point
+├── public/            # Static assets
+└── package.json       # Project configuration
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
+## Contributing
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-### DIY Deployment
+## License
 
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-Make sure to deploy the output of `npm run build`
+## Acknowledgments
 
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+- [React](https://reactjs.org/)
+- [React Router](https://reactrouter.com/)
+- [Leaflet](https://leafletjs.com/)
+- [React Leaflet](https://react-leaflet.js.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
