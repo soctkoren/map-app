@@ -124,48 +124,26 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
 
         <div className="style-controls">
           {!overlay.isSvg && (
-            <select
-              value={fontFamily}
-              onChange={(e) => {
-                setFontFamily(e.target.value);
-                onUpdate(overlay.id, text, {
-                  fontSize,
-                  color: textColor,
-                  rotation,
-                  fontFamily: e.target.value
-                });
-              }}
-              className="font-select"
-            >
-              {AVAILABLE_FONTS.map(font => (
-                <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
-                  {font.name}
-                </option>
-              ))}
-            </select>
-          )}
-
-          <div className="size-control">
-            <label>{overlay.isSvg ? 'Icon Size' : 'Font Size'}</label>
-            <div className="size-slider-container">
-              <input
-                type="range"
-                value={fontSize}
+            <>
+              <select
+                value={fontFamily}
                 onChange={(e) => {
-                  const newSize = parseInt(e.target.value);
-                  setFontSize(newSize);
-                  onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
-                    fontSize: newSize,
+                  setFontFamily(e.target.value);
+                  onUpdate(overlay.id, text, {
+                    fontSize,
                     color: textColor,
                     rotation,
-                    fontFamily
+                    fontFamily: e.target.value
                   });
                 }}
-                min={overlay.isSvg ? 24 : 12}
-                max={overlay.isSvg ? 96 : 200}
-                step="1"
-                className="size-slider"
-              />
+                className="font-select"
+              >
+                {AVAILABLE_FONTS.map(font => (
+                  <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                    {font.name}
+                  </option>
+                ))}
+              </select>
               <input
                 type="number"
                 value={fontSize}
@@ -173,7 +151,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
                   const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
                   if (!isNaN(newSize)) {
                     setFontSize(newSize);
-                    onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
+                    onUpdate(overlay.id, text, {
                       fontSize: newSize,
                       color: textColor,
                       rotation,
@@ -181,13 +159,13 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
                     });
                   }
                 }}
-                min={overlay.isSvg ? 24 : 12}
-                max={overlay.isSvg ? 96 : 200}
+                min="0"
+                max="200"
                 step="1"
-                className="size-input"
+                placeholder="Font size"
               />
-            </div>
-          </div>
+            </>
+          )}
           
           <div className="color-control">
             <label>Color</label>
@@ -399,7 +377,16 @@ const MapControls: React.FC<MapControlsProps> = ({
           <button className="add-text-btn" onClick={handleStartAddText}>
             Add Text
           </button>
-          <SvgIconSelector onAddIcon={onAddText} />
+          <SvgIconSelector 
+            selectedIcon=""
+            onSelectIcon={(iconPath) => onAddText(iconPath, {
+              fontSize: 48,
+              color: '#0066FF',
+              rotation: 0,
+              fontFamily: 'sans-serif',
+              isSvg: true
+            })}
+          />
         </div>
         <div className="text-layers">
           {textOverlays.map((overlay) => (
@@ -488,33 +475,45 @@ const MapControls: React.FC<MapControlsProps> = ({
       </div>
 
       <div className={`social-buttons ${showSizeSelector ? 'hidden' : ''}`}>
-        <img 
-          src="/me.jpeg" 
-          alt="Jonny K" 
-          className="profile-image"
-        />
-        <a href="https://www.paypal.com/donate/?business=W7PELRRREYBSU&no_recurring=0&item_name=Thanks+for+supporting+my+work+%3A%29&currency_code=USD" className="donate-button" target="_blank" rel="noopener noreferrer">
+        <a 
+          href="https://www.linkedin.com/in/jonnykvids/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          title="Visit my LinkedIn"
+          className="profile-link"
+        >
+          <img 
+            src="/me.jpeg" 
+            alt="Jonny K" 
+            className="profile-image"
+          />
+        </a>
+        <a 
+          href="https://www.paypal.com/donate/?business=W7PELRRREYBSU&no_recurring=0&item_name=Thanks+for+supporting+my+work+%3A%29&currency_code=USD" 
+          className="donate-button" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          title="Buy me a coffee"
+        >
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 19H20L19.5 21H4.5L4 19Z" fill="currentColor" />
             <path d="M18 4H6V13C6 15.7614 8.23858 18 11 18H13C15.7614 18 18 15.7614 18 13V4Z" fill="currentColor" />
             <path d="M18 4H20V9C20 10.1046 19.1046 11 18 11V4Z" fill="currentColor" />
           </svg>
-          Buy me a coffee
+          <span className="sr-only">Buy me a coffee</span>
         </a>
-        <div className="social-row">
-          <a href="https://www.youtube.com/@jonnykvids" className="youtube-button" target="_blank" rel="noopener noreferrer">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M23.5 6.2C23.3 5.4 22.7 4.8 22 4.6C20.1 4 12 4 12 4C12 4 3.9 4 2 4.6C1.3 4.8 0.7 5.4 0.5 6.2C0 8.1 0 12 0 12C0 12 0 15.9 0.5 17.8C0.7 18.6 1.3 19.2 2 19.4C3.9 20 12 20 12 20C12 20 20.1 20 22 19.4C22.7 19.2 23.3 18.6 23.5 17.8C24 15.9 24 12 24 12C24 12 24 8.1 23.5 6.2ZM9.5 15.5V8.5L16 12L9.5 15.5Z" fill="currentColor"/>
-            </svg>
-            YouTube
-          </a>
-          <a href="https://www.linkedin.com/in/jonnykvids/" className="linkedin-button" target="_blank" rel="noopener noreferrer">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.3 6.5a1.78 1.78 0 01-1.8 1.75zM19 19h-3v-4.74c0-1.42-.6-1.93-1.38-1.93A1.74 1.74 0 0013 14.19a.66.66 0 000 .14V19h-3v-9h2.9v1.3a3.11 3.11 0 012.7-1.4c1.55 0 3.36.86 3.36 3.66z" fill="currentColor"/>
-            </svg>
-            LinkedIn
-          </a>
-        </div>
+        <a 
+          href="https://www.youtube.com/@jonnykvids" 
+          className="youtube-button" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          title="Visit my YouTube channel"
+        >
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23.5 6.2C23.3 5.4 22.7 4.8 22 4.6C20.1 4 12 4 12 4C12 4 3.9 4 2 4.6C1.3 4.8 0.7 5.4 0.5 6.2C0 8.1 0 12 0 12C0 12 0 15.9 0.5 17.8C0.7 18.6 1.3 19.2 2 19.4C3.9 20 12 20 12 20C12 20 20.1 20 22 19.4C22.7 19.2 23.3 18.6 23.5 17.8C24 15.9 24 12 24 12C24 12 24 8.1 23.5 6.2ZM9.5 15.5V8.5L16 12L9.5 15.5Z" fill="currentColor"/>
+          </svg>
+          <span className="sr-only">Visit my YouTube channel</span>
+        </a>
       </div>
 
       {selectedLayerId && (

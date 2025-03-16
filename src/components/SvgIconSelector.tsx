@@ -4,46 +4,31 @@ import { SVG_ICONS } from '../types';
 import './SvgIconSelector.css';
 
 interface SvgIconSelectorProps {
-  onAddIcon: (svgPath: string, style: LayerStyle) => void;
+  selectedIcon: string;
+  onSelectIcon: (iconPath: string) => void;
 }
 
-const ICON_NAMES: { [key: string]: string } = {
-  mapPin: 'Map Pin',
-  heart: 'Heart',
-  star: 'Star',
-  babyBottle: 'Baby Bottle',
-  graduation: 'Graduation'
-};
+type IconKey = keyof typeof SVG_ICONS;
 
-const SvgIconSelector: React.FC<SvgIconSelectorProps> = ({ onAddIcon }) => {
-  const handleIconClick = (svgPath: string) => {
-    onAddIcon(svgPath, {
-      fontSize: 48, // Default size for icons
-      color: '#0066FF', // Default color
-      rotation: 0,
-      fontFamily: 'sans-serif',
-      isSvg: true
-    });
+const SvgIconSelector: React.FC<SvgIconSelectorProps> = ({ selectedIcon, onSelectIcon }) => {
+  const iconNames = Object.keys(SVG_ICONS) as IconKey[];
+
+  const getIconDisplayName = (key: IconKey) => {
+    return key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1').trim();
   };
 
   return (
-    <div className="svg-icon-selector">
-      <div className="icon-grid">
-        {Object.entries(SVG_ICONS).map(([key, path]) => (
-          <button 
-            key={key}
-            className="icon-button"
-            onClick={() => handleIconClick(path)}
-            title={ICON_NAMES[key]}
-          >
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="icon-preview">
-              <path d={path} fill="currentColor"/>
-            </svg>
-            <span className="icon-name">{ICON_NAMES[key]}</span>
-          </button>
-        ))}
-      </div>
-    </div>
+    <select
+      className="svg-icon-selector"
+      value={selectedIcon}
+      onChange={(e) => onSelectIcon(e.target.value)}
+    >
+      {iconNames.map((iconName) => (
+        <option key={iconName} value={SVG_ICONS[iconName]}>
+          {getIconDisplayName(iconName)}
+        </option>
+      ))}
+    </select>
   );
 };
 

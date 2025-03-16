@@ -353,6 +353,49 @@
   box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
 }
 
+.svg-icon-selector {
+  margin-bottom: 16px;
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+  background: #f7fafc;
+  border-color: #0066FF;
+  transform: translateY(-1px);
+}
+
+.icon-preview {
+  width: 20px;
+  height: 20px;
+  color: #4a5568;
+}
+
+.icon-name {
+  display: none;
+}
+
+.icon-button:hover .icon-preview {
+  color: #0066FF;
+}
+
 .text-layers {
   margin-top: 16px;
   border-top: 1px solid #edf2f7;
@@ -765,16 +808,18 @@
 
 .social-buttons {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
-  width: 252px;
+  left: 24px;
+  top: 50%;
+  transform: translateY(calc(25vh - 50%));
+  width: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: white;
-  padding: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 900;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
@@ -782,14 +827,13 @@
 .social-buttons.hidden {
   opacity: 0;
   pointer-events: none;
-  transform: translateY(10px);
+  transform: translateY(calc(25vh - 50%)) translateY(10px);
 }
 
 .profile-image {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  margin: 0 auto 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   object-fit: cover;
   border: 2px solid #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -800,72 +844,47 @@
   transform: scale(1.05);
 }
 
-.social-row {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-}
-
 .donate-button,
-.youtube-button,
-.linkedin-button {
-  display: inline-flex;
+.youtube-button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 12px;
   background: #fff;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 12px;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 14px;
   transition: all 0.2s ease;
-  width: 100%;
-  min-height: 34px;
 }
 
 .donate-button svg,
-.youtube-button svg,
-.linkedin-button svg {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.donate-button {
+.youtube-button svg {
+  width: 24px;
+  height: 24px;
   color: #4a5568;
 }
 
-.youtube-button {
+.donate-button:hover,
+.youtube-button:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.donate-button:hover svg {
+  color: #0066FF;
+}
+
+.youtube-button:hover svg {
   color: #FF0000;
 }
 
-.linkedin-button {
-  color: #0A66C2;
-}
-
-.donate-button:hover {
-  background: #f7fafc;
-  color: #2d3748;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.youtube-button:hover {
-  background: #FFF5F5;
-  color: #E00000;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.linkedin-button:hover {
-  background: #E8F4F9;
-  color: #0077B5;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+/* Hide the text, show only icons */
+.donate-button span,
+.youtube-button span {
+  display: none;
 }
 
 .search-input {
@@ -910,77 +929,63 @@
   z-index: 1;
 }
 
-.size-control {
-  margin-bottom: 16px;
-  grid-column: 1 / -1;
-  width: 100%;
-}
-
-.size-control label {
+.profile-link {
   display: block;
-  font-size: 12px;
-  color: #4a5568;
-  margin-bottom: 8px;
+  transition: transform 0.2s ease;
 }
 
-.size-slider-container {
+.profile-link:hover {
+  transform: scale(1.05);
+}
+
+.profile-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.donate-button,
+.youtube-button {
+  width: 48px;
+  height: 48px;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.size-slider {
-  width: 100%;
-  height: 4px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: #e2e8f0;
-  border-radius: 2px;
-  outline: none;
-}
-
-.size-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #0066FF;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.size-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
-
-.size-slider::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: #0066FF;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.size-slider::-moz-range-thumb:hover {
-  transform: scale(1.2);
-}
-
-.size-input {
-  width: 80px;
-  padding: 6px 8px;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
   border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #1a202c;
-  text-align: center;
-  align-self: flex-end;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
-.size-input:focus {
-  outline: none;
-  border-color: #0066FF;
-  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+.donate-button svg,
+.youtube-button svg {
+  width: 24px;
+  height: 24px;
+  color: #4a5568;
+}
+
+.donate-button:hover,
+.youtube-button:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.donate-button:hover svg {
+  color: #0066FF;
+}
+
+.youtube-button:hover svg {
+  color: #FF0000;
+}
+
+/* Hide the text, show only icons */
+.donate-button span,
+.youtube-button span {
+  display: none;
 } 
