@@ -18,17 +18,20 @@ const SvgIconSelector: React.FC<SvgIconSelectorProps> = ({ selectedIcon, onSelec
   };
 
   return (
-    <select
-      className="svg-icon-selector"
-      value={selectedIcon}
-      onChange={(e) => onSelectIcon(e.target.value)}
-    >
+    <div className="map-pins-grid">
       {iconNames.map((iconName) => (
-        <option key={iconName} value={SVG_ICONS[iconName]}>
-          {getIconDisplayName(iconName)}
-        </option>
+        <button
+          key={iconName}
+          className={`map-pin-button ${SVG_ICONS[iconName] === selectedIcon ? 'selected' : ''}`}
+          onClick={() => onSelectIcon(SVG_ICONS[iconName])}
+          title={getIconDisplayName(iconName)}
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d={SVG_ICONS[iconName]} />
+          </svg>
+        </button>
       ))}
-    </select>
+    </div>
   );
 };
 
