@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import type { PosterSize, TextOverlay, TextStyle, MapStyle } from '../types';
 import './MapControls.css';
 import { backgrounds } from './BackgroundGallery';
+import SvgIconSelector from './SvgIconSelector';
 
 interface MapControlsProps {
   onAddText: (text: string, style: TextStyle) => void;
@@ -81,7 +82,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
     const newRotation = Number(e.target.value);
     const snappedRotation = snapRotation(newRotation);
     setRotation(snappedRotation);
-    onUpdate(overlay.id, text, {
+    onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
       fontSize,
       color: textColor,
       rotation: snappedRotation,
@@ -90,7 +91,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
   };
 
   const handleUpdate = () => {
-    onUpdate(overlay.id, text, {
+    onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
       fontSize,
       color: textColor,
       rotation,
@@ -101,71 +102,84 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
   return (
     <div className="layer-editor-popup">
       <div className="layer-editor-content">
-        <h4>{isNew ? 'Add New Text' : 'Edit Layer'}</h4>
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            onUpdate(overlay.id, e.target.value, {
-              fontSize,
-              color: textColor,
-              rotation,
-              fontFamily
-            });
-          }}
-          placeholder="Enter text..."
-          autoFocus
-        />
-        <div className="style-controls">
-          <select
-            value={fontFamily}
+        <h4>{isNew ? (overlay.isSvg ? 'Add New Icon' : 'Add New Text') : 'Edit Layer'}</h4>
+        
+        {!overlay.isSvg && (
+          <input
+            type="text"
+            value={text}
             onChange={(e) => {
-              setFontFamily(e.target.value);
-              onUpdate(overlay.id, text, {
+              setText(e.target.value);
+              onUpdate(overlay.id, e.target.value, {
                 fontSize,
                 color: textColor,
                 rotation,
-                fontFamily: e.target.value
+                fontFamily
               });
             }}
-            className="font-select"
-          >
-            {AVAILABLE_FONTS.map(font => (
-              <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
-                {font.name}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            value={fontSize}
-            onChange={(e) => {
-              const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
-              if (!isNaN(newSize)) {
-                setFontSize(newSize);
-                onUpdate(overlay.id, text, {
-                  fontSize: newSize,
-                  color: textColor,
-                  rotation,
-                  fontFamily
-                });
-              }
-            }}
-            min="0"
-            max="200"
-            step="1"
-            placeholder="Font size"
+            placeholder="Enter text..."
+            autoFocus
           />
-          <input
-            type="color"
-            value={textColor}
-            onChange={(e) => {
-              setTextColor(e.target.value);
-              handleUpdate();
-            }}
-            title="Text color"
-          />
+        )}
+
+        <div className="style-controls">
+          {!overlay.isSvg && (
+            <>
+              <select
+                value={fontFamily}
+                onChange={(e) => {
+                  setFontFamily(e.target.value);
+                  onUpdate(overlay.id, text, {
+                    fontSize,
+                    color: textColor,
+                    rotation,
+                    fontFamily: e.target.value
+                  });
+                }}
+                className="font-select"
+              >
+                {AVAILABLE_FONTS.map(font => (
+                  <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                    {font.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                value={fontSize}
+                onChange={(e) => {
+                  const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
+                  if (!isNaN(newSize)) {
+                    setFontSize(newSize);
+                    onUpdate(overlay.id, text, {
+                      fontSize: newSize,
+                      color: textColor,
+                      rotation,
+                      fontFamily
+                    });
+                  }
+                }}
+                min="0"
+                max="200"
+                step="1"
+                placeholder="Font size"
+              />
+            </>
+          )}
+          
+          <div className="color-control">
+            <label>Color</label>
+            <input
+              type="color"
+              value={textColor}
+              onChange={(e) => {
+                setTextColor(e.target.value);
+                handleUpdate();
+              }}
+              title={overlay.isSvg ? "Icon color" : "Text color"}
+            />
+          </div>
+
           <div className="rotation-control">
             <div className="rotation-label">
               <span>Rotation: {rotation}°</span>
@@ -173,7 +187,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
                 className="reset-rotation"
                 onClick={() => {
                   setRotation(0);
-                  onUpdate(overlay.id, text, {
+                  onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
                     fontSize,
                     color: textColor,
                     rotation: 0,
@@ -359,31 +373,50 @@ const MapControls: React.FC<MapControlsProps> = ({
 
       <div className="control-section">
         <div className="text-controls-header">
-          <h3>Text Layers</h3>
+          <h3>Add Content</h3>
           <button className="add-text-btn" onClick={handleStartAddText}>
             Add Text
           </button>
+          <SvgIconSelector onAddIcon={onAddText} />
         </div>
         <div className="text-layers">
           {textOverlays.map((overlay) => (
-            <div
-              key={overlay.id}
-              className={`text-layer ${selectedLayerId === overlay.id ? 'selected' : ''}`}
-              onClick={() => setSelectedLayerId(overlay.id)}
-            >
-              <span className="layer-text">{overlay.text}</span>
-              <button
-                className="delete-layer-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDeleteText(overlay.id);
-                  if (selectedLayerId === overlay.id) {
-                    setSelectedLayerId(null);
-                  }
-                }}
-              >
-                ×
-              </button>
+            <div key={overlay.id} className="text-layer">
+              <div className="layer-preview">
+                {overlay.isSvg ? (
+                  <>
+                    <svg viewBox="0 0 24 24" className="layer-icon" fill={overlay.color || 'currentColor'}>
+                      <path d={overlay.svgPath} />
+                    </svg>
+                    <span>Map Icon</span>
+                  </>
+                ) : (
+                  <span>{overlay.text}</span>
+                )}
+              </div>
+              <div className="layer-actions">
+                <button
+                  className="edit-layer-btn"
+                  onClick={() => {
+                    setSelectedLayerId(overlay.id);
+                    setIsAddingNewText(false);
+                  }}
+                  aria-label="Edit layer"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                  </svg>
+                </button>
+                <button
+                  className="delete-text-btn"
+                  onClick={() => onDeleteText(overlay.id)}
+                  aria-label="Delete layer"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
         </div>

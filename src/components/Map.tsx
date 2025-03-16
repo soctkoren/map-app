@@ -138,6 +138,8 @@ interface DragState {
   textId: string;
   textX: number;
   textY: number;
+  offsetX: number;
+  offsetY: number;
 }
 
 interface MapControlsProps {
@@ -185,7 +187,9 @@ const Map: React.FC = () => {
     startY: 0,
     textId: '',
     textX: 0,
-    textY: 0
+    textY: 0,
+    offsetX: 0,
+    offsetY: 0
   });
   const [showCenterGuides, setShowCenterGuides] = useState<{x: boolean, y: boolean}>({ x: false, y: false });
 
@@ -242,11 +246,14 @@ const Map: React.FC = () => {
       id: Date.now().toString(),
       text: text || '',
       x: rect.width / 2,
-      y: rect.height * 0.8, // Position at 80% of height (20% from bottom)
-      fontSize: style?.fontSize || 100,
+      y: rect.height * 0.8,
+      fontSize: style?.fontSize || (style?.isEmoji ? 48 : 100),
       color: style?.color || '#000000',
       rotation: style?.rotation || 0,
-      fontFamily: style?.fontFamily || 'Roboto'
+      fontFamily: style?.fontFamily || 'Roboto',
+      isEmoji: style?.isEmoji || false,
+      isSvg: style?.isSvg || false,
+      svgPath: style?.isSvg ? text : undefined
     };
 
     setTextOverlays([...textOverlays, newText]);
@@ -293,7 +300,12 @@ const Map: React.FC = () => {
 
   const handleMouseDown = (e: React.MouseEvent, overlay: TextOverlay) => {
     e.preventDefault();
-    const target = e.currentTarget as SVGTextElement;
+    const rect = printViewportRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    // Calculate the initial offset between mouse and element center
+    const offsetX = e.clientX - rect.left - overlay.x;
+    const offsetY = e.clientY - rect.top - overlay.y;
     
     dragStateRef.current = {
       isDragging: true,
@@ -301,12 +313,13 @@ const Map: React.FC = () => {
       startY: e.clientY,
       textId: overlay.id,
       textX: overlay.x,
-      textY: overlay.y
+      textY: overlay.y,
+      offsetX,
+      offsetY
     };
 
     setDraggingId(overlay.id);
 
-    // Add event listeners for drag and drop
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
@@ -314,41 +327,43 @@ const Map: React.FC = () => {
   const handleMouseMove = (e: MouseEvent) => {
     if (!dragStateRef.current.isDragging || !printViewportRef.current) return;
 
-    const viewport = printViewportRef.current;
-    const rect = viewport.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    const rect = printViewportRef.current.getBoundingClientRect();
+    
+    // Calculate new position accounting for the initial offset
+    let newX = e.clientX - rect.left - dragStateRef.current.offsetX;
+    let newY = e.clientY - rect.top - dragStateRef.current.offsetY;
 
-    const dx = e.clientX - dragStateRef.current.startX;
-    const dy = e.clientY - dragStateRef.current.startY;
+    // Find the overlay being dragged
+    const overlay = textOverlays.find(o => o.id === dragStateRef.current.textId);
+    if (!overlay) return;
 
-    // Calculate new positions
-    let newX = dragStateRef.current.textX + dx;
-    let newY = dragStateRef.current.textY + dy;
+    // Only apply snapping to text layers (not SVG icons)
+    if (!overlay.isSvg) {
+      // Center snapping
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
 
-    // Check if near center lines and snap if needed
-    const nearCenterX = isNearCenter(newX, centerX);
-    const nearCenterY = isNearCenter(newY, centerY);
+      if (Math.abs(newX - centerX) < SNAP_THRESHOLD) {
+        newX = centerX;
+        setShowCenterGuides(prev => ({ ...prev, x: true }));
+      } else {
+        setShowCenterGuides(prev => ({ ...prev, x: false }));
+      }
 
-    // Update guide visibility
-    setShowCenterGuides({
-      x: nearCenterX,
-      y: nearCenterY
-    });
+      if (Math.abs(newY - centerY) < SNAP_THRESHOLD) {
+        newY = centerY;
+        setShowCenterGuides(prev => ({ ...prev, y: true }));
+      } else {
+        setShowCenterGuides(prev => ({ ...prev, y: false }));
+      }
+    }
 
-    // Snap to center if near
-    if (nearCenterX) newX = centerX;
-    if (nearCenterY) newY = centerY;
-
+    // Update the overlay position
     setTextOverlays(overlays =>
-      overlays.map(overlay =>
-        overlay.id === dragStateRef.current.textId
-          ? {
-              ...overlay,
-              x: newX,
-              y: newY
-            }
-          : overlay
+      overlays.map(o =>
+        o.id === dragStateRef.current.textId
+          ? { ...o, x: newX, y: newY }
+          : o
       )
     );
   };
@@ -416,10 +431,10 @@ const Map: React.FC = () => {
               mapContainer.style.borderRadius = '0';
             }
 
-            // Hide controls and tooltip
-            const elementsToHide = clonedViewport.querySelectorAll('.leaflet-control, .print-size-indicator, .map-info-tooltip');
-            elementsToHide.forEach((element) => {
-              (element as HTMLElement).style.display = 'none';
+            // Hide controls
+            const controls = clonedViewport.querySelectorAll('.leaflet-control, .print-size-indicator');
+            controls.forEach((control) => {
+              (control as HTMLElement).style.display = 'none';
             });
 
             // Scale text overlays and preserve font properties
@@ -541,63 +556,73 @@ const Map: React.FC = () => {
           <MapContainer
             center={DEFAULT_CENTER}
             zoom={DEFAULT_ZOOM}
-            scrollWheelZoom={true}
             style={{ width: '100%', height: '100%' }}
           >
-            <TileLayer
-              url={selectedMapStyle.url}
-              attribution={selectedMapStyle.attribution}
-            />
             <MapOperations onMapReady={handleMapReady} />
-          </MapContainer>
-
-          <div className="map-info-tooltip" role="tooltip" aria-label="How to use">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm2-1.645A3.502 3.502 0 0012 6.5a3.501 3.501 0 00-3.433 2.813l1.962.393A1.5 1.5 0 1112 11.5a1 1 0 00-1 1V14h2v-.645z" fill="currentColor"/>
+            <TileLayer
+              attribution={selectedMapStyle.attribution}
+              url={selectedMapStyle.url}
+            />
+            <svg 
+              className="text-overlay-container" 
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                position: 'absolute', 
+                top: 0, 
+                left: 0, 
+                pointerEvents: 'none',
+                overflow: 'visible'
+              }}
+            >
+              {renderCenterGuides()}
+              
+              {textOverlays.map((overlay) => (
+                overlay.isSvg ? (
+                  <g
+                    key={overlay.id}
+                    transform={`translate(${overlay.x}, ${overlay.y}) rotate(${overlay.rotation}) scale(${overlay.fontSize / 24})`}
+                    style={{
+                      cursor: 'move',
+                      pointerEvents: 'auto'
+                    }}
+                    onMouseDown={(e) => handleMouseDown(e, overlay)}
+                    onContextMenu={handleContextMenu}
+                  >
+                    <path
+                      d={overlay.svgPath}
+                      fill={overlay.color}
+                      className={draggingId === overlay.id ? 'dragging' : ''}
+                    />
+                  </g>
+                ) : (
+                  <text
+                    key={overlay.id}
+                    x={overlay.x}
+                    y={overlay.y}
+                    fontSize={calculateScaledFontSize(overlay.fontSize)}
+                    fill={overlay.color}
+                    className={`${draggingId === overlay.id ? 'dragging' : ''} ${overlay.isEmoji ? 'emoji-layer' : ''}`}
+                    style={{
+                      transform: `rotate(${overlay.rotation}deg)`,
+                      transformBox: 'fill-box',
+                      transformOrigin: '50% 50%',
+                      cursor: 'move',
+                      userSelect: 'none',
+                      fontFamily: overlay.isEmoji ? 'sans-serif' : overlay.fontFamily,
+                      dominantBaseline: 'middle',
+                      textAnchor: 'middle',
+                      pointerEvents: 'auto'
+                    }}
+                    onMouseDown={(e) => handleMouseDown(e, overlay)}
+                    onContextMenu={handleContextMenu}
+                  >
+                    {overlay.text}
+                  </text>
+                )
+              ))}
             </svg>
-          </div>
-
-          <svg 
-            className="text-overlay-container" 
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              position: 'absolute', 
-              top: 0, 
-              left: 0, 
-              pointerEvents: 'none',
-              overflow: 'visible'
-            }}
-          >
-            {/* Render center guides */}
-            {renderCenterGuides()}
-            
-            {textOverlays.map((overlay) => (
-              <text
-                key={overlay.id}
-                x={overlay.x}
-                y={overlay.y}
-                fontSize={calculateScaledFontSize(overlay.fontSize)}
-                fill={overlay.color}
-                className={draggingId === overlay.id ? 'dragging' : ''}
-                style={{
-                  transform: `rotate(${overlay.rotation}deg)`,
-                  transformBox: 'fill-box',
-                  transformOrigin: '50% 50%',
-                  cursor: 'move',
-                  userSelect: 'none',
-                  fontFamily: overlay.fontFamily,
-                  dominantBaseline: 'middle',
-                  textAnchor: 'middle',
-                  pointerEvents: 'auto'
-                }}
-                onMouseDown={(e) => handleMouseDown(e, overlay)}
-                onContextMenu={handleContextMenu}
-              >
-                {overlay.text}
-              </text>
-            ))}
-          </svg>
+          </MapContainer>
         </div>
       </div>
       <MapControls

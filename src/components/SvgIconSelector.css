@@ -1,0 +1,31 @@
+.svg-icon-selector {
+  margin-top: 16px;
+}
+
+.add-icon-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: #0066FF;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.add-icon-btn:hover {
+  background: #0052CC;
+  transform: translateY(-1px);
+}
+
+.icon-preview {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+} 
