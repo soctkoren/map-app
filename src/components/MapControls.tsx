@@ -124,7 +124,7 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
 
         <div className="style-controls">
           {!overlay.isSvg && (
-            <>
+            <div className="style-control">
               <select
                 value={fontFamily}
                 onChange={(e) => {
@@ -144,31 +144,38 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
                   </option>
                 ))}
               </select>
-              <input
-                type="number"
-                value={fontSize}
-                onChange={(e) => {
-                  const newSize = e.target.value === '' ? 0 : parseInt(e.target.value);
-                  if (!isNaN(newSize)) {
-                    setFontSize(newSize);
-                    onUpdate(overlay.id, text, {
-                      fontSize: newSize,
-                      color: textColor,
-                      rotation,
-                      fontFamily
-                    });
-                  }
-                }}
-                min="0"
-                max="200"
-                step="1"
-                placeholder="Font size"
-              />
-            </>
+            </div>
           )}
           
-          <div className="color-control">
-            <label>Color</label>
+          <div className="style-control">
+            <label>
+              <span>{overlay.isSvg ? 'Icon Size' : 'Font Size'}</span>
+              <span className="value-display">{fontSize}px</span>
+            </label>
+            <input
+              type="range"
+              value={fontSize}
+              onChange={(e) => {
+                const newSize = parseInt(e.target.value);
+                setFontSize(newSize);
+                onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
+                  fontSize: newSize,
+                  color: textColor,
+                  rotation,
+                  fontFamily
+                });
+              }}
+              min={overlay.isSvg ? "24" : "12"}
+              max={overlay.isSvg ? "96" : "200"}
+              step="1"
+            />
+          </div>
+          
+          <div className="style-control">
+            <label>
+              <span>Color</span>
+              <span className="value-display">{textColor}</span>
+            </label>
             <input
               type="color"
               value={textColor}
@@ -180,51 +187,27 @@ const LayerEditor: React.FC<LayerEditorProps> = ({ overlay, onUpdate, onClose, i
             />
           </div>
 
-          <div className="rotation-control">
-            <div className="rotation-label">
-              <span>Rotation: {rotation}°</span>
-              <button 
-                className="reset-rotation"
-                onClick={() => {
-                  setRotation(0);
-                  onUpdate(overlay.id, overlay.isSvg ? overlay.svgPath! : text, {
-                    fontSize,
-                    color: textColor,
-                    rotation: 0,
-                    fontFamily
-                  });
-                }}
-              >
-                Reset
-              </button>
-            </div>
-            <div className="rotation-slider-container">
-              <div className="angle-markers">
-                <span>-180°</span>
-                <span>-90°</span>
-                <span>0°</span>
-                <span>90°</span>
-                <span>180°</span>
-              </div>
-              <input
-                type="range"
-                value={rotation}
-                onChange={handleRotationChange}
-                min="-180"
-                max="180"
-                step="1"
-                className="rotation-slider"
-              />
-              <div className="angle-ticks">
-                <div className="tick" style={{ left: '0%' }}></div>
-                <div className="tick" style={{ left: '25%' }}></div>
-                <div className="tick" style={{ left: '50%' }}></div>
-                <div className="tick" style={{ left: '75%' }}></div>
-                <div className="tick" style={{ left: '100%' }}></div>
-              </div>
+          <div className="style-control">
+            <label>
+              <span>Rotation</span>
+              <span className="value-display">{rotation}°</span>
+            </label>
+            <input
+              type="range"
+              value={rotation}
+              onChange={handleRotationChange}
+              min="-180"
+              max="180"
+              step="1"
+            />
+            <div className="angle-markers">
+              <span>-180°</span>
+              <span>0°</span>
+              <span>180°</span>
             </div>
           </div>
         </div>
+
         <button className="close-editor-btn" onClick={onClose}>
           Done
         </button>
